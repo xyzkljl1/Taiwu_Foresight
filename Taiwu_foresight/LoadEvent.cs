@@ -26,7 +26,6 @@ namespace Taiwu_Foresight
         public static HashSet<string> Standard_ConqOrDestroy = new HashSet<string> { };//征服或摧毁
         public static HashSet<string> Standard_AllSame = new HashSet<string> { };//毫无意义的选项
         //恶人谷
-        public static HashSet<string> ERenGu_Destroy = new HashSet<string> { };
         //叛徒结伙
         public static HashSet<string> Pantu_Win = new HashSet<string> { };//道中胜利
         public static HashSet<string> Pantu_Destroy = new HashSet<string> { };//分支1，和门徒合流
@@ -88,11 +87,7 @@ namespace Taiwu_Foresight
             {
                 var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_ERenGu_Language_CN.txt");
                 //恶人谷摧毁
-                foreach (var name in new string[] { "外道-恶人谷终点1-胜处决", "外道-恶人谷终点-敌人逃脱", "外道-恶人谷终点1-胜2-1" })
-                    if (myEventInfos.ContainsKey(name))
-                        ERenGu_Destroy.Add(myEventInfos[name].guid);
-                if (ERenGu_Destroy.Count != 3)
-                    LogUnexpectedEvent("恶人谷终点");
+                MatchEqualEvents(ref Standard_Destroy, myEventInfos,new string[] { "外道-恶人谷终点1-胜处决", "外道-恶人谷终点-敌人逃脱", "外道-恶人谷终点1-胜2-1" } , "恶人谷摧毁");
                 //征服分岔
                 MatchEqualEvents(ref Standard_ConqOrDestroy, myEventInfos, "外道-恶人谷终点1-胜", "恶人谷征服Delay");
                 MatchEqualEvents(ref Standard_ConqOrDestroy_Delay, myEventInfos, "外道-恶人谷终点1-胜1-1", "恶人谷征服");
@@ -123,6 +118,9 @@ namespace Taiwu_Foresight
                 MatchEqualEvents(ref Standard_AllSame, myEventInfos, new string[] { "外道-悍匪砦-起点关押-1", "外道-悍匪砦-起点1-胜1", "外道-悍匪砦-起点1-胜1处决", "外道-悍匪砦-起点1-敌方逃跑" }, "悍匪寨起点分支1");
                 //转点1消耗真气 4c4dd807-b41d-4170-b82d-c5b13acef5bc
                 MatchEqualEvents(ref Hanfei_ReduceNeili, myEventInfos, "外道-悍匪砦-转点1-1-1-1-1", "悍匪寨转点1");
+            }
+            {
+
             }
         }
         public static void MatchEvents(ref HashSet<string> result, Dictionary<string, MyEventInfo> myEventInfos,string regex_str,int expect_ct,string fail_hint="")

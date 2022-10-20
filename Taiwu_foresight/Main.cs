@@ -224,19 +224,6 @@ namespace Taiwu_Foresight
             {
                 result += ToInfo("别看了，所有选项都一样");
             }
-            //恶人谷
-            else if (ERenGu_Destroy.Contains(currEventGuid))
-            {
-                //选项0-4对应5个性格，5对应逃跑即-1
-                int idx = GetIndex(event_info);
-                if(idx==4)//恶人谷唯我选项bug，传进去的是叛逆
-                {
-                    result += GetDestroyNestText(3);
-                    result += ToInfo("(获得叛逆选项的奖励是Bug)");
-                }
-                else
-                    result += GetDestroyNestText(idx < 5 ? (sbyte)idx : (sbyte)-1);
-            }
             //叛徒结伙
             else if (Pantu_Destroy.Contains(currEventGuid))//叛徒结伙，达到分支
             {

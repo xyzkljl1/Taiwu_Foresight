@@ -16,7 +16,7 @@ namespace LaLaLa
         public readonly static string EventSourceDir = "E:\\TaiwuMod\\Source\\EventLib\\";
         public readonly static string EventLanguageDir = "G:\\Steam\\steamapps\\common\\The Scroll Of Taiwu\\Event\\EventLanguages\\";
         public readonly static string EventNoteDir = "E:\\TaiwuMod\\Source\\Note\\";
-        public struct ForwardTarget
+        public class ForwardTarget
         {
             public enum TargetType
             {
@@ -24,16 +24,20 @@ namespace LaLaLa
                 StartCombat,
                 DestroyEnemyNest,
                 ConquerEnemyNest,
+                SelectAdventureBranch,
+                SetAdventureParameter,
                 Empty,
                 Event,
                 Dummy
             }
             public TargetType type;
             public string guid;
+            public string para;
             public ForwardTarget(TargetType _type, string _guid = "")
             {
                 this.type = _type;
                 this.guid = _guid;
+                this.para = "";
             }
         }
 
@@ -86,20 +90,24 @@ namespace LaLaLa
                     return "未导入的事件";
                 return events[target.guid].name;
             }
-            else if(target.type == ForwardTarget.TargetType.Dummy)
+            else if (target.type == ForwardTarget.TargetType.Dummy)
             {
                 if (!events.ContainsKey(target.guid))
                     return "未导入的事件";
-                return events[target.guid].name+"(Dummy)";
+                return events[target.guid].name + "(Dummy)";
             }
             else if (target.type == ForwardTarget.TargetType.StartCombat)
-                return "开战";
+                return $"开战(跳转:{target.para})";
             else if (target.type == ForwardTarget.TargetType.ExitAdventure)
-                return "离开巢穴";
+                return $"离开巢穴(是否关闭:{target.para})";
             else if (target.type == ForwardTarget.TargetType.DestroyEnemyNest)
-                return "摧毁巢穴";
+                return $"摧毁巢穴(立场{target.para})";
             else if (target.type == ForwardTarget.TargetType.ConquerEnemyNest)
-                return "征服巢穴";
+                return $"征服巢穴";
+            else if (target.type != ForwardTarget.TargetType.SelectAdventureBranch)
+                return $"设置分支{target.para}";
+            else if (target.type != ForwardTarget.TargetType.SetAdventureParameter)
+                return $"设置参数{target.para}";
             else if (target.type == ForwardTarget.TargetType.Empty)
                 return "结束对话";
             return "";
@@ -107,16 +115,14 @@ namespace LaLaLa
         public HashSet<ForwardTarget> GetForwardTargetsFromMethod(BaseMethodDeclarationSyntax root)
         {
             var result = new HashSet<ForwardTarget>();
-            var queue = new List<SyntaxNode>();
-            queue.AddRange(root.ChildNodes());
+            var queue = new Queue<SyntaxNode>();
+            foreach (var node in root.ChildNodes())
+                queue.Enqueue(node);
             if (root.ToFullString().Contains("string.Empty"))
                 result.Add(new ForwardTarget(ForwardTarget.TargetType.Empty));
-
             while (queue.Count > 0)
             {
-                var node = queue.Take(1).First();
-                queue.Remove(node);
-                queue.AddRange((IEnumerable<SyntaxNode>)node.ChildNodes());
+                var node = queue.Dequeue();
                 if (node.IsKind(SyntaxKind.StringLiteralExpression))//字符串常量
                 {
                     Guid guid;
@@ -124,34 +130,75 @@ namespace LaLaLa
                     if (Guid.TryParse(tmp, out guid))
                         result.Add(new ForwardTarget(ForwardTarget.TargetType.Event, tmp));
                 }
-                //else if(node.IsKind(SyntaxKind.ReturnStatement))//return
-                //{}
                 else if (node.IsKind(SyntaxKind.InvocationExpression))
-                {
+                {                    
                     var text = node.ToString();
+                    ForwardTarget target=null;
+                    var para = GetParameterFromInvoke(node as InvocationExpressionSyntax);
                     if (text.Contains("StartCombat"))
-                        result.Add(new ForwardTarget(ForwardTarget.TargetType.StartCombat));
+                    {
+                        target = new ForwardTarget(ForwardTarget.TargetType.StartCombat);
+                        target.para = para.Count >= 5 ? para[2]:"";//跳转
+                    }
                     else if (text.Contains("ExitAdventure"))
-                        result.Add(new ForwardTarget(ForwardTarget.TargetType.ExitAdventure));
+                    {
+                        target = new ForwardTarget(ForwardTarget.TargetType.ExitAdventure);
+                        target.para = para.Count >= 1 ? para[0] : "";//是否关闭
+                    }
                     else if (text.Contains("DestroyEnemyNest"))
-                        result.Add(new ForwardTarget(ForwardTarget.TargetType.DestroyEnemyNest));
+                    {
+                        target = new ForwardTarget(ForwardTarget.TargetType.DestroyEnemyNest);
+                        target.para = para.Count >= 2 ? para[1] : "";//性格
+                    }
                     else if (text.Contains("ConquerEnemyNest"))
-                        result.Add(new ForwardTarget(ForwardTarget.TargetType.ConquerEnemyNest));
+                        target = new ForwardTarget(ForwardTarget.TargetType.ConquerEnemyNest);
+                    else if (text.Contains("SelectAdventureBranch"))
+                    {
+                        target = new ForwardTarget(ForwardTarget.TargetType.SelectAdventureBranch);
+                        target.para = para.Count >= 1 ? para[0] : "";//分支
+                    }
+                    else if (text.Contains("SetAdventureParameter"))
+                    {
+                        target = new ForwardTarget(ForwardTarget.TargetType.SetAdventureParameter);
+                        target.para = String.Join(",", para);
+                    }
+                    if(target!=null)
+                        result.Add(target);
                 }
+                foreach (var _n in node.ChildNodes())
+                    queue.Enqueue(_n);
+            }
+            return result;
+        }
+        public List<string> GetParameterFromInvoke(InvocationExpressionSyntax root)
+        {
+            var result = new List<string>();
+            var queue = new Queue<SyntaxNode>();
+            foreach(var node in root.ChildNodes())
+                queue.Enqueue(node);
+            while (queue.Count > 0)
+            {
+                var node = queue.Dequeue();
+                if(node.IsKind(SyntaxKind.ArgumentList))
+                    foreach (var _n in node.ChildNodes())
+                        queue.Enqueue(_n);
+                else if (node.IsKind(SyntaxKind.Argument))
+                    result.Add(node.ToString());
             }
             return result;
         }
         public List<string> GetOptionKeyFromMethod(BaseMethodDeclarationSyntax root)
         {
             var result = new List<string>();
-            var queue = new List<SyntaxNode>();
-            queue.AddRange(root.ChildNodes());
+            var queue = new Queue<SyntaxNode>();
+            foreach (var _n in root.ChildNodes())
+                queue.Enqueue(_n);
             var optionKeyRegex = new Regex("\"Option_[0-9-]*\"");
             while (queue.Count > 0)
             {
-                var node = queue.Take(1).First();
-                queue.Remove(node);
-                queue.AddRange((IEnumerable<SyntaxNode>)node.ChildNodes());
+                var node = queue.Dequeue();
+                foreach (var _n in node.ChildNodes())
+                    queue.Enqueue(_n);
                 if (node.IsKind(SyntaxKind.StringLiteralExpression))//字符串常量
                     if(optionKeyRegex.IsMatch(node.ToString()))
                     {
@@ -173,8 +220,9 @@ namespace LaLaLa
         {
             var name = root.GetFirstToken().Text;
             var result = new EventInfo();
-            var queue = new List<SyntaxNode>();
-            queue.AddRange(root.ChildNodes());
+            var queue = new Queue<SyntaxNode>();
+            foreach (var _n in root.ChildNodes())
+                queue.Enqueue(_n);
             {
                 var class_name = root.Identifier.Text;
                 class_name=class_name.Replace("TaiwuEvent_", "");
@@ -183,17 +231,11 @@ namespace LaLaLa
                     return null;
                 result.guid = guid.ToString("D");
             }
-            if(result.guid== "002b306d-2d5d-43d2-8fe9-52a1e6e2a75e")
-            {
-                Console.WriteLine("");
-            }
             var optionSelectRegex = new Regex("^OnOption([0-9]+)Select$");
             while (queue.Count > 0)
             {
-                var node = queue.Take(1).First();
-                queue.Remove(node);
+                var node = queue.Dequeue();
                 var s = node.ToFullString();
-                Console.WriteLine(s);
                 if (node.IsKind(SyntaxKind.ConstructorDeclaration))
                 {
                     ConstructorDeclarationSyntax method_node = node as ConstructorDeclarationSyntax;
@@ -232,7 +274,8 @@ namespace LaLaLa
                             result.code += "\n" + method_node.ToFullString();
                         }
                     }
-                    queue.AddRange(node.ChildNodes());
+                    foreach (var _n in node.ChildNodes())
+                        queue.Enqueue(_n);
                 }
             }
             return result;
@@ -287,14 +330,14 @@ namespace LaLaLa
         {
             var text = File.ReadAllText(path);
             var syntax_tree = CSharpSyntaxTree.ParseText(text);
-            var queue = new List<SyntaxNode>();
-            queue.Add(syntax_tree.GetRoot());
+            var queue = new Queue<SyntaxNode>();
+            queue.Enqueue(syntax_tree.GetRoot());
             while (queue.Count > 0)
             {
-                var node = queue.Take(1).First();
-                queue.Remove(node);
+                var node = queue.Dequeue();
                 if (node.IsKind(SyntaxKind.NamespaceDeclaration) || node.IsKind(SyntaxKind.CompilationUnit))
-                    queue.AddRange(node.ChildNodes());
+                    foreach (var _n in node.ChildNodes())
+                        queue.Enqueue(_n);
                 else if (node.IsKind(SyntaxKind.ClassDeclaration))
                 {
                     var eventInfo = LoadEventClass((ClassDeclarationSyntax)node);
