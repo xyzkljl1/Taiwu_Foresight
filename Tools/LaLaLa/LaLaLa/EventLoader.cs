@@ -20,6 +20,7 @@ namespace LaLaLa
         {
             public enum TargetType
             {
+                SetAllowExitAdventure,
                 ExitAdventure,
                 StartCombat,
                 DestroyEnemyNest,
@@ -98,10 +99,12 @@ namespace LaLaLa
             }
             else if (target.type == ForwardTarget.TargetType.StartCombat)
                 return $"开战(跳转{target.para})";
+            else if (target.type == ForwardTarget.TargetType.SetAllowExitAdventure)
+                return $"允许离开巢穴({target.para})";
             else if (target.type == ForwardTarget.TargetType.ExitAdventure)
-                return $"离开巢穴(关闭{target.para})";
+                return $"离开巢穴({target.para})";
             else if (target.type == ForwardTarget.TargetType.DestroyEnemyNest)
-                return $"摧毁巢穴(立场{target.para})";
+                return $"摧毁巢穴({target.para})";
             else if (target.type == ForwardTarget.TargetType.ConquerEnemyNest)
                 return $"征服巢穴";
             else if (target.type == ForwardTarget.TargetType.SelectAdventureBranch)
@@ -139,6 +142,11 @@ namespace LaLaLa
                     {
                         target = new ForwardTarget(ForwardTarget.TargetType.StartCombat);
                         target.para = para.Count >= 5 ? para[2]:"";//跳转
+                    }
+                    else if(text.Contains("SetAllowExitAdventure"))
+                    {
+                        target = new ForwardTarget(ForwardTarget.TargetType.SetAllowExitAdventure);
+                        target.para = para.Count >= 1 ? para[0] : "";//是否允许
                     }
                     else if (text.Contains("ExitAdventure"))
                     {
