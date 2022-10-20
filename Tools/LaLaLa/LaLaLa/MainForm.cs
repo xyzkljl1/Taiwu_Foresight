@@ -24,5 +24,6 @@ namespace LaLaLa
             noteApplyButton.Click += this.OnNoteApply;
             RefreshPanel(prefixTextBox.Text);
         }
-            }
+
+    }
 }

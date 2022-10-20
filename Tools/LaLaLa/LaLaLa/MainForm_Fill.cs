@@ -99,16 +99,19 @@ namespace LaLaLa
             control = new Label();
             control.BorderStyle = BorderStyle.FixedSingle;
             control.Text = event_loader.GetForwardTargetText(root_node).Replace(prefix, "");
+            control.AutoEllipsis = true;
             if (root_node.type != ForwardTarget.TargetType.Event && root_node.type != ForwardTarget.TargetType.Dummy)//非事件
                 control.Text = $"[{control.Text}]";
             control.Location = new System.Drawing.Point(currentRow*grid_width, currentLine*grid_height);
             control.Size = new System.Drawing.Size(label_width, label_height);
             mainPanel.Controls.Add(control);
+            if(root_node.type== ForwardTarget.TargetType.Dummy||root_node.type== ForwardTarget.TargetType.Event)
+                if(event_loader.events.ContainsKey(root_node.guid))
+                    control.MouseClick += delegate (object sender, MouseEventArgs e) { this.OnClickEvent(root_node.guid); };
             if (!event_loader.IsValidEvent(root_node))
                 return (control, currentLine + 1);
             //子节点
             var currEvent = event_loader.events[root_node.guid];            
-            control.MouseClick += delegate (object sender, MouseEventArgs e) { this.OnClickEvent(root_node.guid); };
             event_controls.Add(root_node.guid, control);
             int initial_line = currentLine;
             for (int i = 0; i < currEvent.options.Count; i++)

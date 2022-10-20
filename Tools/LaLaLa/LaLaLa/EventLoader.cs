@@ -104,9 +104,9 @@ namespace LaLaLa
                 return $"摧毁巢穴(立场{target.para})";
             else if (target.type == ForwardTarget.TargetType.ConquerEnemyNest)
                 return $"征服巢穴";
-            else if (target.type != ForwardTarget.TargetType.SelectAdventureBranch)
+            else if (target.type == ForwardTarget.TargetType.SelectAdventureBranch)
                 return $"设置分支{target.para}";
-            else if (target.type != ForwardTarget.TargetType.SetAdventureParameter)
+            else if (target.type == ForwardTarget.TargetType.SetAdventureParameter)
                 return $"设置参数{target.para}";
             else if (target.type == ForwardTarget.TargetType.Empty)
                 return "结束对话";
@@ -156,8 +156,6 @@ namespace LaLaLa
                     {
                         target = new ForwardTarget(ForwardTarget.TargetType.SelectAdventureBranch);
                         target.para = para.Count >= 1 ? para[0] : "";//分支
-                        if (target.para == "")
-                            Console.WriteLine();
                     }
                     else if (text.Contains("SetAdventureParameter"))
                     {

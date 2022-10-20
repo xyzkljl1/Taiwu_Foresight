@@ -31,13 +31,13 @@
             this.codeTextBox = new System.Windows.Forms.TextBox();
             this.noteTextBox = new System.Windows.Forms.TextBox();
             this.mainPanel = new System.Windows.Forms.Panel();
-            this.guidLabel = new System.Windows.Forms.Label();
             this.noteApplyButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.prefixTextBox = new System.Windows.Forms.TextBox();
             this.prefixApplyButton = new System.Windows.Forms.Button();
             this.contextLabel = new System.Windows.Forms.Label();
+            this.guidLabel = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // codeTextBox
@@ -72,16 +72,6 @@
             this.mainPanel.Size = new System.Drawing.Size(2230, 1404);
             this.mainPanel.TabIndex = 3;
             // 
-            // guidLabel
-            // 
-            this.guidLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.guidLabel.AutoSize = true;
-            this.guidLabel.Location = new System.Drawing.Point(2245, 9);
-            this.guidLabel.Name = "guidLabel";
-            this.guidLabel.Size = new System.Drawing.Size(79, 15);
-            this.guidLabel.TabIndex = 4;
-            this.guidLabel.Text = "GUIDLabel";
-            // 
             // noteApplyButton
             // 
             this.noteApplyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -94,6 +84,7 @@
             // 
             // label1
             // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label1.Location = new System.Drawing.Point(2248, 859);
@@ -105,6 +96,7 @@
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(2248, 92);
             this.label2.Name = "label2";
@@ -131,26 +123,32 @@
             // 
             // contextLabel
             // 
-            this.contextLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.contextLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.contextLabel.Location = new System.Drawing.Point(2248, 37);
             this.contextLabel.Name = "contextLabel";
             this.contextLabel.Size = new System.Drawing.Size(323, 55);
             this.contextLabel.TabIndex = 10;
             this.contextLabel.Text = "ContextLabel";
             // 
+            // guidLabel
+            // 
+            this.guidLabel.Location = new System.Drawing.Point(2248, 6);
+            this.guidLabel.Name = "guidLabel";
+            this.guidLabel.Size = new System.Drawing.Size(323, 25);
+            this.guidLabel.TabIndex = 11;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2583, 1453);
+            this.Controls.Add(this.guidLabel);
             this.Controls.Add(this.contextLabel);
             this.Controls.Add(this.prefixApplyButton);
             this.Controls.Add(this.prefixTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.noteApplyButton);
-            this.Controls.Add(this.guidLabel);
             this.Controls.Add(this.mainPanel);
             this.Controls.Add(this.noteTextBox);
             this.Controls.Add(this.codeTextBox);
@@ -166,13 +164,13 @@
         private System.Windows.Forms.TextBox codeTextBox;
         private System.Windows.Forms.TextBox noteTextBox;
         private System.Windows.Forms.Panel mainPanel;
-        private System.Windows.Forms.Label guidLabel;
         private System.Windows.Forms.Button noteApplyButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox prefixTextBox;
         private System.Windows.Forms.Button prefixApplyButton;
         private System.Windows.Forms.Label contextLabel;
+        private System.Windows.Forms.TextBox guidLabel;
     }
 }
 
