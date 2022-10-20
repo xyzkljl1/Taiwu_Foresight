@@ -48,6 +48,7 @@ namespace LaLaLa
         {
             public string guid;
             public string name;
+            public string text="";
             public string note="";
             public string code="";
             public List<Option> options = new List<Option>();
@@ -240,6 +241,7 @@ namespace LaLaLa
         void LoadEventLanguage(string path)
         {
             EventInfo currEvent = null;
+            var optionRegex = new Regex("Option_([0-9]+)");
             foreach (var line in File.ReadAllLines(path))
             {
                 if (line.Length == 0) continue;
@@ -248,30 +250,34 @@ namespace LaLaLa
                 string value = line.Substring(index + 2); //Skip the ':' and the whitespace
                 switch (new string(key.Where(Char.IsLetter).ToArray()))
                 {
-                    //EventGuid总是在最顶层,每当读到EventGuid，将上一个Event塞进去
+                    //EventGuid总是在最顶层
                     case "EventGuid":
                         if (events.ContainsKey(value))
                             currEvent = events[value];
                         else
                             currEvent = null;
                         break;
-                    //case "EventContent":
-                    //    break;
-                    //case "Option":
-                    //break;
+                    case "EventContent":
+                        if (currEvent != null)
+                            currEvent.text = value;
+                        break;
                     case "EventName":
                         if(currEvent != null)
                             currEvent.name = value;
                         break;
                     default:
                         if (currEvent != null)
-                            if (key.StartsWith("Option_"))
+                        {
+                            var matches=optionRegex.Match(key);
+                            if (matches.Success)
                             {
-                                int idx=Int32.Parse(value.Replace("Option_", ""))-1;//从1开始//应该不会抛异常吧
+                                int idx=Int32.Parse(matches.Groups[1].Value)-1;//Language中是从1开始
                                 while (currEvent.options.Count < idx + 1)
                                     currEvent.options.Add(new Option());
-                                currEvent.options[idx].text=value;
+                                currEvent.options[idx].text = value;
                             }
+
+                        }
                         break;
                 }
             }

@@ -37,15 +37,17 @@
             this.label2 = new System.Windows.Forms.Label();
             this.prefixTextBox = new System.Windows.Forms.TextBox();
             this.prefixApplyButton = new System.Windows.Forms.Button();
+            this.contextLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // codeTextBox
             // 
             this.codeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.codeTextBox.Location = new System.Drawing.Point(2248, 48);
+            this.codeTextBox.Location = new System.Drawing.Point(2248, 110);
             this.codeTextBox.Multiline = true;
             this.codeTextBox.Name = "codeTextBox";
-            this.codeTextBox.Size = new System.Drawing.Size(323, 808);
+            this.codeTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.codeTextBox.Size = new System.Drawing.Size(323, 746);
             this.codeTextBox.TabIndex = 0;
             // 
             // noteTextBox
@@ -55,6 +57,7 @@
             this.noteTextBox.Location = new System.Drawing.Point(2248, 890);
             this.noteTextBox.Multiline = true;
             this.noteTextBox.Name = "noteTextBox";
+            this.noteTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.noteTextBox.Size = new System.Drawing.Size(323, 522);
             this.noteTextBox.TabIndex = 1;
             // 
@@ -103,7 +106,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(2248, 30);
+            this.label2.Location = new System.Drawing.Point(2248, 92);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(39, 15);
             this.label2.TabIndex = 7;
@@ -126,11 +129,22 @@
             this.prefixApplyButton.Text = "SearchPrefix";
             this.prefixApplyButton.UseVisualStyleBackColor = true;
             // 
+            // contextLabel
+            // 
+            this.contextLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.contextLabel.Location = new System.Drawing.Point(2248, 37);
+            this.contextLabel.Name = "contextLabel";
+            this.contextLabel.Size = new System.Drawing.Size(323, 55);
+            this.contextLabel.TabIndex = 10;
+            this.contextLabel.Text = "ContextLabel";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2583, 1453);
+            this.Controls.Add(this.contextLabel);
             this.Controls.Add(this.prefixApplyButton);
             this.Controls.Add(this.prefixTextBox);
             this.Controls.Add(this.label2);
@@ -158,6 +172,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox prefixTextBox;
         private System.Windows.Forms.Button prefixApplyButton;
+        private System.Windows.Forms.Label contextLabel;
     }
 }
 

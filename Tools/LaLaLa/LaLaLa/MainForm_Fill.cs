@@ -98,8 +98,9 @@ namespace LaLaLa
             Label control = null;
             control = new Label();
             control.BorderStyle = BorderStyle.FixedSingle;
-            control.Text = event_loader.GetForwardTargetText(root_node);
-            control.Text.Replace(prefix, "");
+            control.Text = event_loader.GetForwardTargetText(root_node).Replace(prefix, "");
+            if (root_node.type != ForwardTarget.TargetType.Event && root_node.type != ForwardTarget.TargetType.Dummy)//非事件
+                control.Text = $"[{control.Text}]";
             control.Location = new System.Drawing.Point(currentRow*grid_width, currentLine*grid_height);
             control.Size = new System.Drawing.Size(label_width, label_height);
             mainPanel.Controls.Add(control);
@@ -117,7 +118,7 @@ namespace LaLaLa
                 {
                     var line=new Line();
                     line.start = control;
-                    line.text = $"选项{i+1}";
+                    line.text = $"选项{i+1}";//显示的option从1开始，和Language中保持一致
                     line.color= Color.Red;
                     if (event_loader.IsValidEvent(root_node)&&event_controls.ContainsKey(forward.guid))//已有则创建Dummy
                     {
@@ -165,6 +166,7 @@ namespace LaLaLa
             var code_text = "";
             var note_text = "";
             var guid_text = "";
+            var context_text = "";
             if(event_loader.events.ContainsKey(guid))
             {
                 var currEvent=event_loader.events[guid];
@@ -172,15 +174,17 @@ namespace LaLaLa
                 code_text = currEvent.code;
                 for(int i=0;i<currEvent.options.Count;i++)
                 {
-                    code_text += $"\nOption{i+1}-{currEvent.options[i].text}\n";
+                    code_text += $"\nOption{i+1}-{currEvent.options[i].text}\n";//显示的option从1开始，和Language中保持一致
                     code_text += currEvent.options[i].code;
                 }
                 note_text=currEvent.note;
                 guid_text=currEvent.guid;
+                context_text = currEvent.text;
             }
             this.codeTextBox.Text = code_text;
             this.noteTextBox.Text = note_text;
             this.guidLabel.Text = guid_text;
+            this.contextLabel.Text = context_text;
         }
 
     }
