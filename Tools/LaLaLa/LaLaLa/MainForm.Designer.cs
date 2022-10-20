@@ -36,29 +36,29 @@
             this.label2 = new System.Windows.Forms.Label();
             this.prefixTextBox = new System.Windows.Forms.TextBox();
             this.prefixApplyButton = new System.Windows.Forms.Button();
-            this.contextLabel = new System.Windows.Forms.Label();
             this.guidLabel = new System.Windows.Forms.TextBox();
+            this.contextLabel = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // codeTextBox
             // 
             this.codeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.codeTextBox.Location = new System.Drawing.Point(2248, 110);
+            this.codeTextBox.Location = new System.Drawing.Point(2248, 175);
             this.codeTextBox.Multiline = true;
             this.codeTextBox.Name = "codeTextBox";
             this.codeTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.codeTextBox.Size = new System.Drawing.Size(323, 746);
+            this.codeTextBox.Size = new System.Drawing.Size(323, 805);
             this.codeTextBox.TabIndex = 0;
             // 
             // noteTextBox
             // 
             this.noteTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.noteTextBox.Location = new System.Drawing.Point(2248, 890);
+            this.noteTextBox.Location = new System.Drawing.Point(2248, 1014);
             this.noteTextBox.Multiline = true;
             this.noteTextBox.Name = "noteTextBox";
             this.noteTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.noteTextBox.Size = new System.Drawing.Size(323, 522);
+            this.noteTextBox.Size = new System.Drawing.Size(323, 398);
             this.noteTextBox.TabIndex = 1;
             // 
             // mainPanel
@@ -87,7 +87,7 @@
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("宋体", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(2248, 859);
+            this.label1.Location = new System.Drawing.Point(2248, 983);
             this.label1.Name = "label1";
             this.label1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.label1.Size = new System.Drawing.Size(68, 28);
@@ -98,7 +98,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(2248, 92);
+            this.label2.Location = new System.Drawing.Point(2248, 157);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(39, 15);
             this.label2.TabIndex = 7;
@@ -121,29 +121,30 @@
             this.prefixApplyButton.Text = "SearchPrefix";
             this.prefixApplyButton.UseVisualStyleBackColor = true;
             // 
+            // guidLabel
+            // 
+            this.guidLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.guidLabel.Location = new System.Drawing.Point(2248, 6);
+            this.guidLabel.Name = "guidLabel";
+            this.guidLabel.Size = new System.Drawing.Size(323, 25);
+            this.guidLabel.TabIndex = 11;
+            // 
             // contextLabel
             // 
             this.contextLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.contextLabel.Location = new System.Drawing.Point(2248, 37);
             this.contextLabel.Name = "contextLabel";
-            this.contextLabel.Size = new System.Drawing.Size(323, 55);
-            this.contextLabel.TabIndex = 10;
-            this.contextLabel.Text = "ContextLabel";
-            // 
-            // guidLabel
-            // 
-            this.guidLabel.Location = new System.Drawing.Point(2248, 6);
-            this.guidLabel.Name = "guidLabel";
-            this.guidLabel.Size = new System.Drawing.Size(323, 25);
-            this.guidLabel.TabIndex = 11;
+            this.contextLabel.Size = new System.Drawing.Size(323, 117);
+            this.contextLabel.TabIndex = 12;
+            this.contextLabel.Text = "";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2583, 1453);
-            this.Controls.Add(this.guidLabel);
             this.Controls.Add(this.contextLabel);
+            this.Controls.Add(this.guidLabel);
             this.Controls.Add(this.prefixApplyButton);
             this.Controls.Add(this.prefixTextBox);
             this.Controls.Add(this.label2);
@@ -169,8 +170,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox prefixTextBox;
         private System.Windows.Forms.Button prefixApplyButton;
-        private System.Windows.Forms.Label contextLabel;
         private System.Windows.Forms.TextBox guidLabel;
+        private System.Windows.Forms.RichTextBox contextLabel;
     }
 }
 
