@@ -31,8 +31,8 @@ namespace LaLaLa
                 Dummy
             }
             public TargetType type;
-            public string guid;
-            public string para;
+            public string guid="";
+            public string para="";
             public ForwardTarget(TargetType _type, string _guid = "")
             {
                 this.type = _type;
@@ -97,9 +97,9 @@ namespace LaLaLa
                 return events[target.guid].name + "(Dummy)";
             }
             else if (target.type == ForwardTarget.TargetType.StartCombat)
-                return $"开战(跳转:{target.para})";
+                return $"开战(跳转{target.para})";
             else if (target.type == ForwardTarget.TargetType.ExitAdventure)
-                return $"离开巢穴(是否关闭:{target.para})";
+                return $"离开巢穴(关闭{target.para})";
             else if (target.type == ForwardTarget.TargetType.DestroyEnemyNest)
                 return $"摧毁巢穴(立场{target.para})";
             else if (target.type == ForwardTarget.TargetType.ConquerEnemyNest)
@@ -156,6 +156,8 @@ namespace LaLaLa
                     {
                         target = new ForwardTarget(ForwardTarget.TargetType.SelectAdventureBranch);
                         target.para = para.Count >= 1 ? para[0] : "";//分支
+                        if (target.para == "")
+                            Console.WriteLine();
                     }
                     else if (text.Contains("SetAdventureParameter"))
                     {
@@ -163,7 +165,10 @@ namespace LaLaLa
                         target.para = String.Join(",", para);
                     }
                     if(target!=null)
+                    {
+                        target.para = target.para.Replace("\"", "");
                         result.Add(target);
+                    }
                 }
                 foreach (var _n in node.ChildNodes())
                     queue.Enqueue(_n);
