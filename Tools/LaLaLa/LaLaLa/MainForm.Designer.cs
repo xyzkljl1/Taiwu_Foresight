@@ -38,6 +38,7 @@
             this.prefixApplyButton = new System.Windows.Forms.Button();
             this.guidLabel = new System.Windows.Forms.TextBox();
             this.contextLabel = new System.Windows.Forms.RichTextBox();
+            this.nameTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // codeTextBox
@@ -138,11 +139,20 @@
             this.contextLabel.TabIndex = 12;
             this.contextLabel.Text = "";
             // 
+            // nameTextBox
+            // 
+            this.nameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.nameTextBox.Location = new System.Drawing.Point(1613, 6);
+            this.nameTextBox.Name = "nameTextBox";
+            this.nameTextBox.Size = new System.Drawing.Size(629, 25);
+            this.nameTextBox.TabIndex = 13;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2583, 1453);
+            this.Controls.Add(this.nameTextBox);
             this.Controls.Add(this.contextLabel);
             this.Controls.Add(this.guidLabel);
             this.Controls.Add(this.prefixApplyButton);
@@ -172,6 +182,7 @@
         private System.Windows.Forms.Button prefixApplyButton;
         private System.Windows.Forms.TextBox guidLabel;
         private System.Windows.Forms.RichTextBox contextLabel;
+        private System.Windows.Forms.TextBox nameTextBox;
     }
 }
 

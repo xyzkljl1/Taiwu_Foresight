@@ -52,8 +52,10 @@ namespace Taiwu_foresight_backend
                 var slip = EventHelper.GetAdventureParameter("slip");
                 var surrender = EventHelper.GetAdventureParameter("surrender");
                 var dies = EventHelper.GetAdventureParameter("dies");
+                var successRate = EventHelper.GetAdventureParameter("successRate");
+                var perSuccessRate = EventHelper.GetAdventureParameter("perSuccessRate");
                 var sectId = EventHelper.GetCurrentAdventureSiteInitData();
-                var results=new List<int> { slip, surrender, dies, sectId };
+                var results=new List<int> { slip, surrender, dies, sectId,successRate, perSuccessRate };
                 __result= GameData.Serializer.Serializer.Serialize(results, returnDataPool);
                 return false;
             }

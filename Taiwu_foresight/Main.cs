@@ -42,6 +42,8 @@ namespace Taiwu_Foresight
         public static int surrender;
         public static int dies;
         public static int sectId;
+        public static int successRate;
+        public static int perSuccessRate;
 
         public override void Dispose()
         {
@@ -358,10 +360,152 @@ namespace Taiwu_Foresight
                 //处决 5fc92eac-df67-4e7a-9991-4679e6d470c5
                 //战胜/敌人逃脱 d02e5579-4d55-4857-a9d2-09fe6324e15e
             }
+            //乱葬岗
+            else if(Luanzang_ChoosePosion.ContainsKey(currEventGuid))
+            {
+                var idx = GetIndex(event_info);
+                if(idx == 0)
+                {
+                    result += ToInfo($"每次前进增加{Luanzang_ChoosePosion[currEventGuid].Item1},随机减少郁/寒/幻毒中的一种(只随机一次)");
+                }
+                else
+                {
+                    result += ToInfo($"每次前进增加{Luanzang_ChoosePosion[currEventGuid].Item2},随机减少赤/烈/腐毒中的一种(只随机一次)");
+                }
+            }
+            else if (Luanzang_ChooseSame.Contains(currEventGuid))
+            {
+                var idx = GetIndex(event_info);
+                if(idx == 0)
+                    result += ToInfo("进入水口分支(烈/郁毒)");
+                else if(idx == 1)
+                    result += ToInfo("进入明堂分支(赤/寒毒)");
+                else
+                    result += ToInfo("进入气脉分支(腐/幻毒)");
+                result += ToInfo("三个分支只有中毒类型有区别");
+            }
+            else if (Luanzang_MuMen.Contains(currEventGuid))
+            {
+                result += ToInfo("战斗");
+                result += ToInfo("胜利/关押/敌方逃跑:破阵计数+1",2);
+                result += ToInfo("失败/逃跑:离开巢穴",2);
+                result += ToInfo("破阵计数>=3:可以退出巢穴;进入终点分支");
+                result += ToInfo("破阵计数<3:重复水口/明堂/气脉");
+            }
+            else if (Luanzang_Trick.Contains(currEventGuid))
+            {
+                result += ToInfo("破阵计数+1");
+                result += ToInfo("破阵计数>=3:可以退出巢穴;进入终点分支");
+                result += ToInfo("破阵计数<3:重复水口/明堂/气脉");
+            }
+            else if (Luanzang_Conq_Delay.Contains(currEventGuid))
+            {
+                var idx = GetIndex(event_info);
+                if (idx == 0)
+                {
+                    result += ToInfo("摧毁或征服巢穴");
+                    result += ToInfo("开战");
+                    result += ToInfo("胜利/敌方逃跑:征服巢穴",2);
+                    result += ToInfo("关押/处决:征服巢穴", 2);
+                    result += ToInfo("逃跑:离开巢穴", 2);
+                }
+                else
+                {
+                    result += ToInfo("摧毁巢穴");
+                    result += ToInfo("开战");
+                    result += ToInfo("胜利/敌方逃跑/关押/处决:摧毁巢穴", 2);
+                    result += ToInfo("逃跑:离开巢穴", 2);
+                }
+            }
+            //	天材地宝
+            else if(Dibao_Give.Contains(currEventGuid))
+            {
+                var idx = GetIndex(event_info);
+                if (idx == 0)
+                {
+                    result += ToInfo($"当前成功率:{successRate}");
+                    result += ToInfo("消耗一个材料");//467ea673-ffa0-41e3-b852-c640c8ef3fff
+                    result += ToInfo($"使成功率增加(10-品级)*{perSuccessRate}");
+                    result += ToInfo("有概率获得3~8品材料");
+                    result += ToInfo("成功率>=90:最高三品", 2);
+                    result += ToInfo("成功率>=60:最高四品", 2);
+                    result += ToInfo("成功率>=40:最高五品", 2);
+                    result += ToInfo("成功率>=30:最高六品", 2);
+                    result += ToInfo("成功率>=20:最高七品", 2);
+                    result += ToInfo("成功率>=10:最高八品", 2);
+                    result += ToInfo("各品级概率(从可以获得的最高品级开始，分别判定每级是否成功,以增加后的成功率计算)");
+                    //由于蜜汁代码用的就是>Random(0,99),所以白送了1%成功率(x=x*100/99)
+                    //5bdd667f-d3da-4d69-a1be-560864edf62b
+                    result += ToInfo($"三品:成功率*15/99={successRate * 15 / 99}%", 2);
+                    result += ToInfo($"四品:成功率*20/99={successRate * 20 / 99}%", 2);
+                    result += ToInfo($"五品:成功率*25/99={successRate * 25 / 99}%", 2);
+                    result += ToInfo($"六品:成功率*30/99={successRate * 30 / 99}%", 2);
+                    result += ToInfo($"七品:成功率*35/99={successRate * 35 / 99}%", 2);
+                    result += ToInfo($"八品:成功率*40/99={successRate * 40 / 99}%", 2);
+                }
+                else
+                {
+                    result += ToInfo("什么都不会发生");
+                }
+            }
+            else if (Dibao_Final.Contains(currEventGuid))
+            {
+                var idx = GetIndex(event_info);
+                if (idx == 0)
+                {
+                    result += ToInfo($"当前成功率:{successRate}");
+                    result += ToInfo("消耗一个材料");
+                    result += ToInfo($"使成功率增加(10-品级)*{perSuccessRate}");
+                    //3feffb60-48c6-4681-9c8d-83558736f2cd
+                    result += ToInfo("获得二品材料概率=(成功率-20)*100/99");
+                    result += ToInfo("如果选择材料时取消,则等同选项2");
 
-            //起点挑衅
-            //	
-
+                }
+                else
+                {
+                    //41ae8f52-3f71-413e-a931-63154f30ec79
+                    //这里平白无故减了20成功率，还因为Random(0,99)送了1
+                    result += ToInfo($"获得二品材料概率=(成功率-20)*100/99={(successRate-20)*100/99}");
+                }
+            }
+            else if (Dibao_Final_XieXieQiezi.Contains(currEventGuid))
+            {
+                var idx = GetIndex(event_info);
+                if (idx == 0)
+                {
+                    result += ToInfo($"当前成功率:{successRate}");
+                    result += ToInfo("消耗一个材料");
+                    result += ToInfo($"使成功率增加(10-品级)*{perSuccessRate}");
+                    //79f01cba-ba3f-4f38-9471-afff79c62067
+                    //因为茄子的bug，这里没有白送1%,但是也没有减20，谢谢茄子
+                    result += ToInfo("获得二品材料概率=成功率");
+                    result += ToInfo("如果选择材料时取消,则等同选项2");
+                }
+                else
+                {
+                    //41ae8f52-3f71-413e-a931-63154f30ec79
+                    //这里平白无故减了20成功率，还因为Random(0,99)送了1
+                    result += ToInfo($"获得二品材料概率=(成功率-20)*100/99={(successRate - 20)*100/99}");
+                }
+            }
+            else if (Dibao_Final_FuckQiezi.Contains(currEventGuid))
+            {
+                var idx = GetIndex(event_info);
+                if (idx == 0)
+                {
+                    result += ToInfo($"当前成功率:{successRate}");
+                    result += ToInfo("消耗一个材料");
+                    result += ToInfo($"使成功率增加(10-品级)*{perSuccessRate}");
+                    //f7c073cd-eec3-4886-b708-f237df807a54
+                    //这里没有bug
+                    result += ToInfo("获得二品材料概率=成功率-20");
+                    result += ToInfo("如果选择材料时取消,则等同选项2");
+                }
+                else
+                {
+                    result += ToInfo($"获得二品材料概率=成功率-20={successRate - 20}");
+                }
+            }
             else if (optionKey == "Option_698382396")//bad63f08-115a-45aa-970c-fa203dd85e2b Option_12 : （背恩绝情……）
             {
                 //Character.ApplyBreakupWithBoyOrGirlFriend
@@ -407,12 +551,15 @@ namespace Taiwu_Foresight
                 else if(tip.PresetParam.Length > 1)
                 {
                     var tmp = tip.PresetParam[1];
+                    if (!tip.gameObject.activeSelf)//不显示说明原有的文本是无效的
+                        tmp = "";
                     //var match= Regex.Match(tmp, MyMagicString);
                     //if(match.Success)
-                        //tmp=tmp.Substring(0, match.Index);
-                    tmp += MyMagicString;
+                    //tmp=tmp.Substring(0, match.Index);
                     if (tmp.Length > 0)
-                        tmp += "\n\n";
+                        tmp += MyMagicString+"\n\n";
+                    else
+                        tmp += MyMagicString;
                     tip.PresetParam[1] = tmp + text;
                     tip.PresetParam[0] = tip.PresetParam[0]+MyMagicString+ "(远见)";
                 }
@@ -471,12 +618,14 @@ namespace Taiwu_Foresight
             {
                 List<int> results = new List<int> ();
                 Serializer.Deserialize(dataPool, offset, ref results);
-                if(results!=null&&results.Count>3)
+                if(results!=null&&results.Count>5)
                 {
                     slip = results[0];
                     surrender = results[1];
                     dies = results[2];
                     sectId = results[3];
+                    successRate=results[4];
+                    perSuccessRate=results[5];
                     //UnityEngine.Debug.Log($"Foresight: Update Adventure Info{results.Join()}");
                 }
                 else

@@ -34,6 +34,20 @@ namespace Taiwu_Foresight
         //悍匪寨
         public static HashSet<string> Hanfei_Start = new HashSet<string> { };//起点交钱
         public static HashSet<string> Hanfei_ReduceNeili = new HashSet<string> { };//减少真气对话
+        //乱葬岗
+        public static Dictionary<string,(string,string)> Luanzang_ChoosePosion = new Dictionary<string, (string, string)> ();
+        public static HashSet<string> Luanzang_ChooseSame = new HashSet<string>();
+        public static HashSet<string> Luanzang_MuMen = new HashSet<string>();
+        public static HashSet<string> Luanzang_Trick = new HashSet<string>();
+        public static HashSet<string> Luanzang_Conq_Delay = new HashSet<string>();
+        //天材地宝
+        public static HashSet<string> Dibao_Give = new HashSet<string>();
+        public static HashSet<string> Dibao_Final = new HashSet<string>();//最终节点
+        public static HashSet<string> Dibao_Final_XieXieQiezi = new HashSet<string>();//因为bug白送了成功率的分支
+        public static HashSet<string> Dibao_Final_FuckQiezi = new HashSet<string>();//因为茄子抽风没有写bug，而失去了获赠的1%成功率的分支
+
+
+
         //为了节省0.01秒的时间，每个文件分别载入并记录
         //传入文件名,返回EventName到其它信息的映射
         public static Dictionary<string, MyEventInfo> LoadEventFile(string file_name)
@@ -119,9 +133,50 @@ namespace Taiwu_Foresight
                 //转点1消耗真气 4c4dd807-b41d-4170-b82d-c5b13acef5bc
                 MatchEqualEvents(ref Hanfei_ReduceNeili, myEventInfos, "外道-悍匪砦-转点1-1-1-1-1", "悍匪寨转点1");
             }
+            //乱葬岗
             {
-
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_LuanZang_Language_CN.txt");
+                MatchEqualEvents(ref Standard_AllSame, myEventInfos, new string[] { "_外道乱葬-起点1" , "_外道乱葬-终点2" , "_外道乱葬-终点6收服胜利" }, "乱葬岗Same");
+                if (myEventInfos.ContainsKey("_外道乱葬-转点气脉1"))
+                    Luanzang_ChoosePosion.Add(myEventInfos["_外道乱葬-转点气脉1"].guid, ("腐毒", "幻毒"));
+                if (myEventInfos.ContainsKey("_外道乱葬-转点水口1"))
+                    Luanzang_ChoosePosion.Add(myEventInfos["_外道乱葬-转点水口1"].guid, ("烈毒", "郁毒"));
+                if (myEventInfos.ContainsKey("_外道乱葬-转点明堂1"))
+                    Luanzang_ChoosePosion.Add(myEventInfos["_外道乱葬-转点明堂1"].guid, ("赤毒", "寒毒"));
+                if (Luanzang_ChoosePosion.Count != 3)
+                    LogUnexpectedEvent("乱葬岗转点");
+                MatchEqualEvents(ref Luanzang_ChooseSame, myEventInfos, new string[]{"_外道乱葬-阵中4", "_外道乱葬-破阵二1", "_外道乱葬-破阵一2"}, "乱葬岗Same2");
+                MatchEqualEvents(ref Luanzang_MuMen, myEventInfos, "_外道乱葬-墓门2", "乱葬岗墓门");
+                MatchEqualEvents(ref Luanzang_Trick, myEventInfos, new string[] { "_外道乱葬-天门1", "_外道乱葬-来龙1" }, "乱葬岗机关");
+                MatchEqualEvents(ref Luanzang_Conq_Delay, myEventInfos, "_外道乱葬-终点3", "乱葬岗终点战前");
+                MatchEqualEvents(ref Standard_Destroy, myEventInfos, new string[] { "_外道乱葬-终点7消灭" }, "乱葬岗摧毁");    
             }
+            {
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindJiuQu_Language_CN.txt");
+                MatchEqualEvents(ref Dibao_Give, myEventInfos, "_地宝紫竹-引藤", "九曲紫竹");
+                MatchEqualEvents(ref Standard_AllSame, myEventInfos, new string[] { "_地宝紫竹-起b-1-1-1" , "_地宝紫竹-起a-1-1-1" }, "九曲紫竹same");
+                MatchEqualEvents(ref Dibao_Final_XieXieQiezi, myEventInfos, "_地宝紫竹-终a-1", "九曲紫竹终点");
+            }
+            {
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindZiTan_Language_CN.txt");
+                MatchEqualEvents(ref Dibao_Give, myEventInfos, new string[] { "_地宝紫檀-伐木一" , "_地宝紫檀-伐木二" }, "紫檀");
+                MatchEqualEvents(ref Dibao_Final, myEventInfos, "_地宝紫檀-终a-1", "紫檀终点");
+            }
+
+            {
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindXuanTie_Language_CN.txt");
+                MatchEqualEvents(ref Dibao_Give, myEventInfos, new string[] { "_地宝玄铁-炼铁二", "_地宝玄铁-炼铁一" }, "玄铁");
+                MatchEqualEvents(ref Standard_AllSame, myEventInfos, new string[] { "_地宝玄铁-起a-1-1", "_地宝玄铁-起b-1-1" }, "玄铁same");
+                MatchEqualEvents(ref Dibao_Final_FuckQiezi, myEventInfos, "_地宝玄铁-终a-1", "玄铁终点");
+            }
+            {
+                //var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindChanQiao_Language_CN.txt");
+                //MatchEqualEvents(ref Dibao_Give, myEventInfos, new string[] { "_地宝玄铁-炼铁二", "_地宝玄铁-炼铁一" }, "玄铁");
+                //MatchEqualEvents(ref Standard_AllSame, myEventInfos, new string[] { "_地宝玄铁-起a-1-1", "_地宝玄铁-起b-1-1" }, "玄铁same");
+                //MatchEqualEvents(ref Dibao_Final_FuckQiezi, myEventInfos, "_地宝玄铁-终a-1", "玄铁终点");
+            }
+
+
         }
         public static void MatchEvents(ref HashSet<string> result, Dictionary<string, MyEventInfo> myEventInfos,string regex_str,int expect_ct,string fail_hint="")
         {
@@ -130,7 +185,7 @@ namespace Taiwu_Foresight
             foreach (var event_pair in myEventInfos)
                 if(regex.IsMatch(event_pair.Key))
                 {
-                    UnityEngine.Debug.Log($"Match:{regex_str}/{event_pair.Key}");
+                    //UnityEngine.Debug.Log($"Match:{regex_str}/{event_pair.Key}");
                     result.Add(event_pair.Value.guid);
                 }
             if (result.Count - tmp_ct!=expect_ct)

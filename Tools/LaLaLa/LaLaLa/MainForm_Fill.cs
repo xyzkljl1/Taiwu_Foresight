@@ -170,6 +170,7 @@ namespace LaLaLa
             var note_text = "";
             var guid_text = "";
             var context_text = "";
+            var name_text = "";
             if(event_loader.events.ContainsKey(guid))
             {
                 var currEvent=event_loader.events[guid];
@@ -183,11 +184,13 @@ namespace LaLaLa
                 note_text=currEvent.note;
                 guid_text=currEvent.guid;
                 context_text = currEvent.text;
+                name_text= currEvent.name;
             }
             this.codeTextBox.Text = code_text;
             this.noteTextBox.Text = note_text;
             this.guidLabel.Text = guid_text;
             this.contextLabel.Text = context_text;
+            this.nameTextBox.Text = name_text;
         }
 
     }
