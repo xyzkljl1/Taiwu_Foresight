@@ -26,6 +26,7 @@ namespace LaLaLa
                 DestroyEnemyNest,
                 ConquerEnemyNest,
                 SelectAdventureBranch,
+                SwitchToSiblingBranch,
                 SetAdventureParameter,
                 Empty,
                 Event,
@@ -109,6 +110,8 @@ namespace LaLaLa
                 return $"征服巢穴";
             else if (target.type == ForwardTarget.TargetType.SelectAdventureBranch)
                 return $"设置分支{target.para}";
+            else if (target.type == ForwardTarget.TargetType.SwitchToSiblingBranch)
+                return $"切换分支{target.para}";
             else if (target.type == ForwardTarget.TargetType.SetAdventureParameter)
                 return $"设置参数{target.para}";
             else if (target.type == ForwardTarget.TargetType.Empty)
@@ -170,7 +173,12 @@ namespace LaLaLa
                         target = new ForwardTarget(ForwardTarget.TargetType.SetAdventureParameter);
                         target.para = String.Join(",", para);
                     }
-                    if(target!=null)
+                    else if(text.Contains("SwitchToSiblingBranch"))
+                    {
+                        target = new ForwardTarget(ForwardTarget.TargetType.SwitchToSiblingBranch);
+                        target.para = para.Count >= 1 ? para[0] : "";//分支
+                    }
+                    if (target!=null)
                     {
                         target.para = target.para.Replace("\"", "");
                         result.Add(target);

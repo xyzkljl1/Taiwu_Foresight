@@ -25,6 +25,17 @@ namespace Taiwu_foresight_backend
         public readonly static ushort MY_MAGIC_NUMBER_GET_PANTU = 7643;
         public static bool On;
         Harmony harmony;
+        public static readonly List<string> AdventureParameterKeys=new List<string>
+        {
+            "slip",
+            "surrender",
+            "dies",
+            "successRate",
+            "perSuccessRate",
+            "neiQiDegree1",
+            "neiQiDegree2",
+            "neiQiDegree3"
+        };
         public override void Dispose()
         {
             if (harmony != null)
@@ -49,14 +60,13 @@ namespace Taiwu_foresight_backend
             if(operation.MethodId== MY_MAGIC_NUMBER_GET_PANTU)
             {
                 AdaptableLog.Info("Foresight:Response Query");
-                var slip = EventHelper.GetAdventureParameter("slip");
-                var surrender = EventHelper.GetAdventureParameter("surrender");
-                var dies = EventHelper.GetAdventureParameter("dies");
-                var successRate = EventHelper.GetAdventureParameter("successRate");
-                var perSuccessRate = EventHelper.GetAdventureParameter("perSuccessRate");
+                var results = new List<int> ();
+                foreach (var key in AdventureParameterKeys)
+                    results.Add(EventHelper.GetAdventureParameter(key));//-1表示未取到
                 var sectId = EventHelper.GetCurrentAdventureSiteInitData();
-                var results=new List<int> { slip, surrender, dies, sectId,successRate, perSuccessRate };
-                __result= GameData.Serializer.Serializer.Serialize(results, returnDataPool);
+                //收发顺序相反
+                __result = GameData.Serializer.Serializer.Serialize(sectId, returnDataPool);
+                __result = GameData.Serializer.Serializer.Serialize(results, returnDataPool);
                 return false;
             }
             return true;

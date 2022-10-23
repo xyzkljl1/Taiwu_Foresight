@@ -38,12 +38,19 @@ namespace Taiwu_Foresight
         public static AdventureItem currentAdventure=null;
         public static EnemyNestItem enemyNestCfg=null;
 
-        public static int slip;
-        public static int surrender;
-        public static int dies;
+        public static readonly List<string> AdventureParameterKeys = new List<string>
+        {
+            "slip",
+            "surrender",
+            "dies",
+            "successRate",
+            "perSuccessRate",
+            "neiQiDegree1",
+            "neiQiDegree2",
+            "neiQiDegree3"
+        };
+        public static Dictionary<string,int> AdventureParameters = new Dictionary<string, int>();
         public static int sectId;
-        public static int successRate;
-        public static int perSuccessRate;
 
         public override void Dispose()
         {
@@ -93,7 +100,7 @@ namespace Taiwu_Foresight
                     {
                         enemyNestCfg = EnemyNest.Instance.First((EnemyNestItem nest) => nest.AdventureId == currentAdventure.TemplateId);
                     }
-                    catch (InvalidOperationException e)//没找到居然要抛异常
+                    catch (InvalidOperationException)//没找到居然要抛异常
                     {
 
                     }
@@ -104,71 +111,11 @@ namespace Taiwu_Foresight
             else
                 enemyNestCfg = null;
         }
-        public unsafe static string GetConquerNestText()
+        public static int GetAdventureParameter(string key)
         {
-            return ToInfo("征服巢穴");//似乎没有额外奖励
-        }
-        //摧毁巢穴，根据性格获得奖励，性格为-1时不会获得任何一种性格对应的奖励，但仍有其它奖励
-        public unsafe static string GetDestroyNestText(sbyte behaviorType)
-        {
-            var result = "摧毁巢穴\n";
-            //AdventureDomain.DestroyEnemyNest
-            if (enemyNestCfg!=null)
-            {
-                UnityEngine.Debug.Log($"Foresight:外道{enemyNestCfg.TipDesc} {enemyNestCfg.TipTitle}");
-                Config.Character instance = Config.Character.Instance;
-                List<short> members = enemyNestCfg.Members;
-                int index = members.Count - 1;
-                CharacterItem enemyLeaderCfg = instance[members[index]];
-                result += ToInfo($"获得{enemyNestCfg.MoneyReward}金钱");
-                result += ToInfo($"获得{enemyNestCfg.AuthorityReward}威望");
-                result += ToInfo($"获得{enemyNestCfg.ExpReward}经验");
-
-                LegacyPointItem configData = LegacyPoint.Instance[13];//遗惠
-                result += ToInfo($"获得{configData.BasePoint}(加成前)生平遗惠");
-                result += ToInfo($"获得{ enemyNestCfg.SpiritualDebtChange}地区恩义");
-                switch (behaviorType)
-                {
-                    case 0:
-                        {
-                            FameActionItem template = FameAction.Instance[41];
-                            result += ToInfo($"获得{template.Name}名声");
-                            result += ToInfo("当前地区所有城镇安定+1");
-                        }
-                        break;
-                    case 1:
-                        {
-                            FameActionItem template = FameAction.Instance[38];
-                            result += ToInfo($"获得{template.Name}名声");
-                            result += ToInfo("当前地区所有城镇文化+1");
-                        }
-                        break;
-                    case 2:
-                        {
-                            result += ToInfo("当前地区所有城镇安定+1");
-                            result += ToInfo("当前地区所有城镇文化+1");
-                        }
-                        break;
-                    case 3:
-                        {
-                            FameActionItem template = FameAction.Instance[42];
-                            result += ToInfo($"获得{template.Name}名声");
-                            result += ToInfo("心情+3");
-                            int moneyGain = enemyLeaderCfg.Resources.Items[6];
-                            result += ToInfo($"获得{moneyGain * 5}~{moneyGain * 10 + 1}金钱");
-                        }
-                        break;
-                    case 4:
-                        {
-                            FameActionItem template = FameAction.Instance[44];
-                            result += ToInfo($"获得{template.Name}名声");
-                            result += ToInfo($"获得同道");
-                        }
-                        break;
-                }
-
-            }
-            return result;
+            if (AdventureParameters.ContainsKey(key))
+                return AdventureParameters[key];
+            return -1;
         }
         //恶人谷坏结果Option_Key
         public static readonly HashSet<string> ERenGu_Bad_OptionKey = new HashSet<string> {
@@ -194,37 +141,35 @@ namespace Taiwu_Foresight
             var result = "";
             string currEventGuid = "";
             if(currEvent!=null)
+                currEventGuid = currEvent.EventGuid;
+            //这里有三种处理方式:根据EventHandlers找到handler，根据EventGuid处理，根据OptionKey处理
+            //应当都使用第一种，但是旧的代码懒得改了，所以保留
+            //选项隐藏会使得Idx变化！！！！
+            int idx = GetIndex(event_info);
+            if (EventHandlers.ContainsKey(currEventGuid))
             {
-                currEventGuid = currEvent.EventGuid;                
+                var handler =EventHandlers[currEventGuid];
+                result += handler.func(idx, handler.args);
             }
-            //使用eventGuid和optionKey两种方式判断，不应使二者有重合
-            //我就是要用if
-            //通用
-            if (Standard_Destroy.Contains(currEventGuid))//通用摧毁巢穴
+            //恶丐
+            else if (EGai_Bribe.Contains(currEventGuid))
             {
-                //选项0-4对应5个性格，5对应逃跑即-1
-                int idx = GetIndex(event_info);
-                result += GetDestroyNestText(idx < 5 ? (sbyte)idx : (sbyte)-1);
-            }
-            else if (Standard_ConqOrDestroy.Contains(currEventGuid))//征服巢穴
-            {
-                int idx = GetIndex(event_info);
-                if (idx == 0)//征服
-                    result += GetConquerNestText();
+                if (idx == 0)
+                    result += ToInfo("连续给钱三次则和平通过,否则开战");
                 else
-                    result += ToInfo("摧毁巢穴");
+                    result += ToInfo("开战");
             }
-            else if (Standard_ConqOrDestroy_Delay.Contains(currEventGuid))//征服前听敌人bb两句
+            else if (EGai_BribeOrFood.Contains(currEventGuid))
             {
-                int idx = GetIndex(event_info);
-                if (idx == 0)//征服
-                    result += ToInfo("征服或摧毁巢穴");
-                else
-                    result += ToInfo("摧毁巢穴");
-            }
-            else if (Standard_AllSame.Contains(currEventGuid))
-            {
-                result += ToInfo("别看了，所有选项都一样");
+                if (idx == 0)
+                    result += ToInfo("给钱并和平通过");
+                else if (idx == 1)
+                {
+                    result += ToInfo("给食物");
+                    result += ToInfo("如果有毒且被对方发现则开战，否则和平通过");
+                }
+                else if (idx == 2)
+                    result += ToInfo("开战");
             }
             //叛徒结伙
             else if (Pantu_Destroy.Contains(currEventGuid))//叛徒结伙，达到分支
@@ -235,7 +180,6 @@ namespace Taiwu_Foresight
             }
             else if(Pantu_Negotiate.Contains(currEventGuid))//叛徒结伙，谈判分支
             {
-                int idx = GetIndex(event_info);
                 if(idx==0)
                 {
                     result += ToInfo("获得一本品级加权随机的功法书");
@@ -260,6 +204,9 @@ namespace Taiwu_Foresight
                 //不同门派的计数要求不一致
                 //分叉1进入"达到"分支，分叉2进入"未达到-多"，分叉3进入"未达到-少"，达到时摧毁巢穴，未达到-多时则可以和叛徒谈判并征服巢穴，未达到-少会Exit(true)即离开并关闭巢穴(不获得摧毁奖励)
                 //如果和叛徒开战获胜或关押，均是无奖励关闭巢穴
+                var dies = GetAdventureParameter("dies");
+                var surrender = GetAdventureParameter("surrender");
+                var slip = GetAdventureParameter("slip");
                 if (sectId >= 0)
                 {
                     bool kill = optionKey == "Option_-414627742";
@@ -318,7 +265,6 @@ namespace Taiwu_Foresight
             //悍匪寨
             else if(Hanfei_Start.Contains(currEventGuid))
             {
-                int idx = GetIndex(event_info);
                 if (idx == 0)
                 {
                     result += ToInfo("失去500块钱");//248b4d584acf414f87a98c7662ec196d
@@ -363,7 +309,6 @@ namespace Taiwu_Foresight
             //乱葬岗
             else if(Luanzang_ChoosePosion.ContainsKey(currEventGuid))
             {
-                var idx = GetIndex(event_info);
                 if(idx == 0)
                 {
                     result += ToInfo($"每次前进增加{Luanzang_ChoosePosion[currEventGuid].Item1},随机减少郁/寒/幻毒中的一种(只随机一次)");
@@ -375,7 +320,6 @@ namespace Taiwu_Foresight
             }
             else if (Luanzang_ChooseSame.Contains(currEventGuid))
             {
-                var idx = GetIndex(event_info);
                 if(idx == 0)
                     result += ToInfo("进入水口分支(烈/郁毒)");
                 else if(idx == 1)
@@ -400,7 +344,6 @@ namespace Taiwu_Foresight
             }
             else if (Luanzang_Conq_Delay.Contains(currEventGuid))
             {
-                var idx = GetIndex(event_info);
                 if (idx == 0)
                 {
                     result += ToInfo("摧毁或征服巢穴");
@@ -420,7 +363,8 @@ namespace Taiwu_Foresight
             //	天材地宝
             else if(Dibao_Give.Contains(currEventGuid))
             {
-                var idx = GetIndex(event_info);
+                var successRate = GetAdventureParameter("successRate");
+                var perSuccessRate = GetAdventureParameter("perSuccessRate");
                 if (idx == 0)
                 {
                     result += ToInfo($"当前成功率:{successRate}");
@@ -450,7 +394,8 @@ namespace Taiwu_Foresight
             }
             else if (Dibao_Final.Contains(currEventGuid))
             {
-                var idx = GetIndex(event_info);
+                var successRate = GetAdventureParameter("successRate");
+                var perSuccessRate = GetAdventureParameter("perSuccessRate");
                 if (idx == 0)
                 {
                     result += ToInfo($"当前成功率:{successRate}");
@@ -470,7 +415,8 @@ namespace Taiwu_Foresight
             }
             else if (Dibao_Final_XieXieQiezi.Contains(currEventGuid))
             {
-                var idx = GetIndex(event_info);
+                var successRate = GetAdventureParameter("successRate");
+                var perSuccessRate = GetAdventureParameter("perSuccessRate");
                 if (idx == 0)
                 {
                     result += ToInfo($"当前成功率:{successRate}");
@@ -490,7 +436,8 @@ namespace Taiwu_Foresight
             }
             else if (Dibao_Final_FuckQiezi.Contains(currEventGuid))
             {
-                var idx = GetIndex(event_info);
+                var successRate = GetAdventureParameter("successRate");
+                var perSuccessRate = GetAdventureParameter("perSuccessRate");
                 if (idx == 0)
                 {
                     result += ToInfo($"当前成功率:{successRate}");
@@ -617,16 +564,18 @@ namespace Taiwu_Foresight
             __instance.AsynchMethodCall(MY_MAGIC_NUMBER_CharacterDomain, MY_MAGIC_NUMBER_GET_PANTU, delegate (int offset, RawDataPool dataPool)
             {
                 List<int> results = new List<int> ();
-                Serializer.Deserialize(dataPool, offset, ref results);
-                if(results!=null&&results.Count>5)
+                //收发顺序相反
+                offset += Serializer.Deserialize(dataPool, offset, ref results);
+                offset+=Serializer.Deserialize(dataPool, offset, ref sectId);
+                //UnityEngine.Debug.Log($"AAA{results.Count} {String.Join(".", results)}");
+                if (results!=null&&results.Count>=AdventureParameterKeys.Count)
                 {
-                    slip = results[0];
-                    surrender = results[1];
-                    dies = results[2];
-                    sectId = results[3];
-                    successRate=results[4];
-                    perSuccessRate=results[5];
                     //UnityEngine.Debug.Log($"Foresight: Update Adventure Info{results.Join()}");
+                    for(int i=0;i<AdventureParameterKeys.Count;i++)
+                    {
+                        AdventureParameters[AdventureParameterKeys[i]]=results[i];
+                        //UnityEngine.Debug.Log($"SetParameter{AdventureParameterKeys[i]}={results[i]}");
+                    }
                 }
                 else
                     UnityEngine.Debug.Log("Foresight: Booooooom!!");
