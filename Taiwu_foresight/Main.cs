@@ -47,7 +47,8 @@ namespace Taiwu_Foresight
             "perSuccessRate",
             "neiQiDegree1",
             "neiQiDegree2",
-            "neiQiDegree3"
+            "neiQiDegree3",
+            "D0"
         };
         public static Dictionary<string,int> AdventureParameters = new Dictionary<string, int>();
         public static int sectId;
@@ -105,7 +106,7 @@ namespace Taiwu_Foresight
 
                     }
                     if (enemyNestCfg != null)
-                        UnityEngine.Debug.Log($"Foresight:外道 {enemyNestCfg.TipDesc} {enemyNestCfg.TipTitle}");
+                        UnityEngine.Debug.Log($"Foresight:外道");
                 }
             }
             else
@@ -149,7 +150,7 @@ namespace Taiwu_Foresight
             if (EventHandlers.ContainsKey(currEventGuid))
             {
                 var handler =EventHandlers[currEventGuid];
-                result += handler.func(idx, handler.args);
+                result += handler.func(idx, event_info, handler.args);
             }
             //恶丐
             else if (EGai_Bribe.Contains(currEventGuid))
@@ -212,7 +213,7 @@ namespace Taiwu_Foresight
                     bool kill = optionKey == "Option_-414627742";
                     bool boundage = optionKey == "Option_700800025";
                     bool letgo = optionKey == "Option_1199181697";
-                    var sect = Config.Organization.Instance[sectId];
+                    var sect = Config.Organization.Instance[sectId];//此处要+1
                     result += ToInfo($"{sect.Name}叛徒结伙计数");
                     result += kill ? ToInfo($"击杀:{dies}->{dies + 1}", 2) : ToInfo($"击杀:{dies}", 2);
                     result += boundage ? ToInfo($"捆绑:{surrender}->{surrender + 1}", 2) : ToInfo($"捆绑:{surrender}", 2);
@@ -564,11 +565,9 @@ namespace Taiwu_Foresight
             __instance.AsynchMethodCall(MY_MAGIC_NUMBER_CharacterDomain, MY_MAGIC_NUMBER_GET_PANTU, delegate (int offset, RawDataPool dataPool)
             {
                 List<int> results = new List<int> ();
-                //收发顺序相反
                 offset += Serializer.Deserialize(dataPool, offset, ref results);
-                offset+=Serializer.Deserialize(dataPool, offset, ref sectId);
                 //UnityEngine.Debug.Log($"AAA{results.Count} {String.Join(".", results)}");
-                if (results!=null&&results.Count>=AdventureParameterKeys.Count)
+                if (results!=null&&results.Count>=AdventureParameterKeys.Count+1)
                 {
                     //UnityEngine.Debug.Log($"Foresight: Update Adventure Info{results.Join()}");
                     for(int i=0;i<AdventureParameterKeys.Count;i++)
@@ -576,6 +575,8 @@ namespace Taiwu_Foresight
                         AdventureParameters[AdventureParameterKeys[i]]=results[i];
                         //UnityEngine.Debug.Log($"SetParameter{AdventureParameterKeys[i]}={results[i]}");
                     }
+                    //这里+1才是实际的sectId
+                    sectId = results[AdventureParameterKeys.Count]+1;
                 }
                 else
                     UnityEngine.Debug.Log("Foresight: Booooooom!!");

@@ -7,6 +7,7 @@ using GameData.Domains.Combat;
 using GameData.Domains.CombatSkill;
 using GameData.Domains.Item;
 using GameData.Domains.SpecialEffect;
+using GameData.Domains.TaiwuEvent;
 using GameData.Domains.TaiwuEvent.EventHelper;
 using GameData.GameDataBridge;
 using GameData.Utilities;
@@ -34,7 +35,8 @@ namespace Taiwu_foresight_backend
             "perSuccessRate",
             "neiQiDegree1",
             "neiQiDegree2",
-            "neiQiDegree3"
+            "neiQiDegree3",
+            "D0"
         };
         public override void Dispose()
         {
@@ -64,12 +66,28 @@ namespace Taiwu_foresight_backend
                 foreach (var key in AdventureParameterKeys)
                     results.Add(EventHelper.GetAdventureParameter(key));//-1表示未取到
                 var sectId = EventHelper.GetCurrentAdventureSiteInitData();
-                //收发顺序相反
-                __result = GameData.Serializer.Serializer.Serialize(sectId, returnDataPool);
+                results.Add(sectId);
                 __result = GameData.Serializer.Serializer.Serialize(results, returnDataPool);
                 return false;
             }
             return true;
         }
+        [HarmonyPrefix, HarmonyPatch(typeof(EventArgBox), "GetAdventureMajorCharacter")]
+        public static void GetAdventureMajorCharacterPatch(EventArgBox __instance, int group, int index)
+        {
+            //debug用
+            var result = "";
+            var charId =0;
+            Dictionary<int, Character> dictionary = (Dictionary<int, Character>)Traverse.Create(DomainManager.Character).Field("_objects").GetValue();
+            foreach (Character character in dictionary.Values)
+            if(character.GetCreatingType()!=2&&character.GetCreatingType()!=3&&character.GetId()!=DomainManager.Taiwu.GetTaiwuCharId())
+            {
+                    charId=character.GetId();
+                    break;
+            }
+
+                __instance.Set(string.Format("MajorCharacter_{0}_{1}", group, index), charId);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameData.Domains.TaiwuEvent.DisplayEvent;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +10,7 @@ using TaiwuModdingLib.Core.Plugin;
 
 namespace Taiwu_Foresight
 {
-    using HandlerFuncType = Func<int, object[],string>;
+    using HandlerFuncType = Func<int, EventOptionInfo, object[],string>;
     public partial class Foresight : TaiwuRemakePlugin
     {
         public struct MyEventInfo
@@ -32,12 +33,7 @@ namespace Taiwu_Foresight
                 args = _args;
             }
         }
-
-
         public static Dictionary<string, MyEventHandler> EventHandlers=new Dictionary<string, MyEventHandler>();
-
-
-
 
         //恶丐窝
         public static HashSet<string> EGai_Bribe = new HashSet<string>();
@@ -86,7 +82,10 @@ namespace Taiwu_Foresight
                     case "EventGuid":
                         if (currEventName != "")
                         {
-                            myEventInfos.Add(currEventName, currEvent);
+                            if(myEventInfos.ContainsKey(currEventName))//重名事件实在不想处理了
+                                UnityEngine.Debug.Log($"Foresight:发现重名事件-{currEventName}");
+                            else
+                                myEventInfos.Add(currEventName, currEvent);
                             currEvent = new MyEventInfo();
                             currEventName = "";
                         }
@@ -102,6 +101,15 @@ namespace Taiwu_Foresight
                         break;
                 }
             }
+            if (currEventName != "")
+            {
+                if (myEventInfos.ContainsKey(currEventName))
+                    UnityEngine.Debug.Log($"Foresight:发现重名事件-{currEventName}");
+                else
+                    myEventInfos.Add(currEventName, currEvent);
+                currEvent = new MyEventInfo();
+                currEventName = "";
+            }
             UnityEngine.Debug.Log($"Foresight:Load {file_name}:{myEventInfos.Count()}");
             return myEventInfos;
         }
@@ -115,6 +123,7 @@ namespace Taiwu_Foresight
             if (eventLoaded)
                 return;
             eventLoaded = true;
+            // EventName居然tmd有重复的！因为实在不想用guid索引，所以重复的干脆弃疗忽略了
             //暂定EventInfo不存
             {
                 var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_ERenGu_Language_CN.txt");
@@ -232,6 +241,51 @@ namespace Taiwu_Foresight
                 MatchEqualEvents(MiXiang_QiDisorder2, myEventInfos, new string[] {
                 "外道-迷香阵-女-路径2-工作1","外道-迷香阵-女-路径2-工作2","外道-迷香阵-女-路径2-工作3",
                 });
+            }
+            {//弃世绝境
+                //重复:_外道绝境-起a-1-1-1 忽略
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_QiShi_Language_CN.txt");
+                MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_外道绝境-起a-1-1-1-1-1" });
+                MatchEqualEvents(Standard_CombatConqSame, myEventInfos, new string[] { "_外道绝境-终a-1-1-1-x高-1-1" });
+                MatchEqualEvents(Standard_ConqSame, myEventInfos, new string[] { "_外道绝境-终a-1-1-1-x高-1-1-x-关押-1", "_外道绝境-终a-1-1-1-x高-1-1-x-战胜-1" });
+
+                MatchEqualEvents(QiShi_FinalMultiCheck, myEventInfos, new string[] { "_外道绝境-终a-1-1-1", "_外道绝境-终a-1-1-1-1低" });
+                MatchEqualEvents(QiShi_MiddleMultiCheck, myEventInfos, 
+                    new string[] { "_外道绝境-转b-1-1", "_外道绝境-转b-1-1-1低", "_外道绝境-转b-1-1-2低", "_外道绝境-转b-1-1-3低" });
+
+                MatchEqualEvents(QiShi_MiddleSingleCheck, myEventInfos,new string[] { "_外道绝境-转a" });
+            }
+            {//邪人死地
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_XieRen_Language_CN.txt");
+                //初遇
+                MatchEqualEvents(Xieren_FirstMet, myEventInfos, new string[] { "_外道邪人-转点0" });
+                MatchEqualEvents(SimpleHandler("破解或放弃", "放弃:在每个拐点再战boss(可逃跑),终点解除限制并再战"), myEventInfos, new string[] { "_外道邪人-转点11问" });
+                MatchEqualEvents(Xieren_TrickChoose, myEventInfos, new string[] { "_外道邪人-转点12破解" });
+
+                MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_外道邪人-背景邪祀1", "_外道邪人-背景衣角1", "_外道邪人-背景衣角2", "_外道邪人-背景衣角3研究", "_外道邪人-背景共主1" ,
+                "_外道邪人-终点收服7","_外道邪人-起点2","_外道邪人-转点8"});
+                MatchEqualEvents(Standard_ConqOrDestroy, myEventInfos, new string[] { "_外道邪人-终点收服9" });
+                MatchEqualEvents(Standard_Destroy, myEventInfos, new string[] { "_外道邪人-终点收服6消灭", "_外道邪人-转点再遇4胜利", "_外道邪人-转点4胜利" , "_外道邪人-终点死战7" });
+                MatchEqualEvents(Standard_ConqOrDestroy_Delay, myEventInfos, new string[] { "_外道邪人-终点收服4胜利" });
+            }
+            {//群魔乱舞
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_QunMo_Language_CN.txt");
+                MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_外道群魔-路a-将死2", "_外道群魔-路a-将死2-1", "_外道群魔-转d-错-1" , "_外道群魔-路a-将死3-1", "_外道群魔-路a-将死1", "_外道群魔-路a-将死1-1" });
+                MatchEqualEvents(Standard_Destroy, myEventInfos, new string[] { "_外道群魔-终-关押", "_外道群魔-终a-战胜-2-1", "_外道群魔-终-敌逃" });
+                MatchEqualEvents(Standard_ConqOrDestroy_Delay, myEventInfos, new string[] { "_外道群魔-终a-战胜" });
+                MatchEqualEvents(Standard_ConqOrDestroy, myEventInfos, new string[] { "_外道群魔-终a-战胜-1-1", "_外道群魔-终b-战胜-1-1" });
+                MatchEqualEvents(SimpleHandler("继续前进或离开巢穴", "离开巢穴"), myEventInfos, new string[] { "_外道群魔-转a-1-1-1" });
+                MatchEqualEvents(SimpleHandler("继续前进", "离开巢穴"), myEventInfos, new string[] { "_外道群魔-转a-1-1-1(选择入魔人)" });
+                MatchEqualEvents(SimpleHandler("进入分支1", "进入分支2"), myEventInfos, new string[] { "_外道群魔-转a-1-1-1-1-1-1", "_外道群魔-转b-1-1-1-1" });
+            }
+            {//修罗
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_XiuLuo_Language_CN.txt");
+                MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_外道修罗-转d-随1-1", "_外道修罗-转d-随2-1", "_外道修罗-转d-随3-1" , "_外道修罗-路a-掉落-1" });
+                MatchEqualEvents(Standard_Destroy, myEventInfos, new string[] { "_外道修罗-终a-达6-1-关押-1", "_外道修罗-转b-1-达3-1-战胜", "_外道修罗-转b-1-达3-1-敌逃", "_外道修罗-终b-1-1-1-1-关押-1", "_外道修罗-终b-1-1-1-1-战胜-2",
+                "_外道修罗-终a-未达6-1-战胜"});
+                MatchEqualEvents(Standard_ConqOrDestroy_Delay, myEventInfos, new string[] { "_外道修罗-终b-1-1-1-1-战胜", "_外道修罗-终b-1-1-1-1-战胜-1" });
+                MatchEqualEvents(Standard_ConqOrDestroy, myEventInfos, new string[] { "_外道修罗-终b-1-1-1-1-战胜-1-1" });
+                MatchEqualEvents(Standard_ConqOrDestroy, myEventInfos, new string[] { "" });
 
             }
             {
@@ -268,6 +322,11 @@ namespace Taiwu_Foresight
         {
             return new MyEventHandler(Standard_Simple, new object[] { option1, option2,option3 });
         }
+        public static MyEventHandler MutltiCheckOrGiveUpHandler(string name, string option1, string option2)
+        {
+            return new MyEventHandler(Standard_MultiCheckOrGiveUp, new object[] { name, option1, option2 });
+        }
+
         public static MyEventHandler CheckHandler(string name,string option1, string option2)
         {
             return new MyEventHandler(Standard_Check2, new object[] { name, option1, option2 });
@@ -288,8 +347,19 @@ namespace Taiwu_Foresight
                         EventHandlers.Add(myEventInfos[name].guid, handler);
                         ct++;
                     }
+                    else
+                    {
+                        UnityEngine.Debug.Log($"333{myEventInfos[name].guid} {name}");
+                    }
             if (ct != names.Count())
+            {
                 LogUnexpectedEvent(fail_hint == "" ? String.Join("/", names) : fail_hint);
+                foreach (var name in names)
+                    if (myEventInfos.ContainsKey(name))
+                        UnityEngine.Debug.Log($"111{name}-{myEventInfos[name].guid}");
+                    else
+                        UnityEngine.Debug.Log($"222{name}");
+            }
         }
 
         public static void MatchEqualEvents(HandlerFuncType handler,Dictionary<string, MyEventInfo> myEventInfos, string[] names, string fail_hint = "")
