@@ -55,10 +55,10 @@ namespace Taiwu_Foresight
         public static HashSet<string> Luanzang_Trick = new HashSet<string>();
         public static HashSet<string> Luanzang_Conq_Delay = new HashSet<string>();
         //天材地宝
-        public static HashSet<string> Dibao_Give = new HashSet<string>();
-        public static HashSet<string> Dibao_Final = new HashSet<string>();//最终节点
-        public static HashSet<string> Dibao_Final_XieXieQiezi = new HashSet<string>();//因为bug白送了成功率的分支
-        public static HashSet<string> Dibao_Final_FuckQiezi = new HashSet<string>();//因为茄子抽风没有写bug，而失去了获赠的1%成功率的分支
+        public static HashSet<string> Dibao_Give_WoodIron = new HashSet<string>();
+        public static HashSet<string> Dibao_Final_WoodIron = new HashSet<string>();//最终节点
+        public static HashSet<string> Dibao_Final_WoodIron_XieXieQiezi = new HashSet<string>();//因为bug白送了成功率的分支
+        public static HashSet<string> Dibao_Final_WoodIron_FuckQiezi = new HashSet<string>();//因为茄子抽风没有写bug，而失去了获赠的1%成功率的分支
 
 
 
@@ -285,42 +285,93 @@ namespace Taiwu_Foresight
                 "_外道修罗-终a-未达6-1-战胜"});
                 MatchEqualEvents(Standard_ConqOrDestroy_Delay, myEventInfos, new string[] { "_外道修罗-终b-1-1-1-1-战胜", "_外道修罗-终b-1-1-1-1-战胜-1" });
                 MatchEqualEvents(Standard_ConqOrDestroy, myEventInfos, new string[] { "_外道修罗-终b-1-1-1-1-战胜-1-1" });
-                MatchEqualEvents(Standard_ConqOrDestroy, myEventInfos, new string[] { "" });
-
+                MatchEqualEvents(Xiuluo_StartChoose, myEventInfos, new string[] { "_外道修罗-转a-1-1-1" });
             }
+            {//异士居
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_WD_YiShi_Language_CN.txt");
+                MatchEqualEvents(Standard_Destroy, myEventInfos, new string[] { "_外道异士-竹林转点12消灭胜利" });
+                MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_外道异士-起点7胜利" });
+                MatchEqualEvents(SimpleHandler("进入战斗分支", LeaveNestFalse), myEventInfos, new string[] { "_外道异士-起点7失败", "_外道异士-挑战3失败", "_外道异士-收服转点5失败" });
+                MatchEqualEvents(YiShi_Challenge, myEventInfos, new string[] { "_外道异士-挑战1-1", "_外道异士-挑战1-3", "_外道异士-挑战1-2a", "_外道异士-挑战1-2c" });
+                MatchEqualEvents(SameMultiLineHandler(ToInfo("开始较艺"), ToInfo("胜利:进入较艺分支(征服或摧毁巢穴)", 2), ToInfo("失败:进入战斗分支(摧毁巢穴)",2)), myEventInfos, new string[] { "_外道异士-起点4" });
+                MatchEqualEvents(SameMultiLineHandler(ToInfo(LeaveNestFalse), ToInfo(AllSame)), myEventInfos, new string[] { "_外道异士-起点8失败离去" });
+                MatchEqualEvents(Standard_ConqSame, myEventInfos, new string[] { "_外道异士-竹林转点9收服" });
+                MatchEqualEvents(SimpleHandler("征服巢穴", "开战并摧毁巢穴"), myEventInfos, new string[] { "_外道异士-竹林转点8胜利" });
+            }
+            //义士堂(不是外道，但仍然是巢穴
+            {
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_RighteousLow_Language_CN.txt");
+                MatchEqualEvents(Standard_ConqSame, myEventInfos, new string[] { "义士堂-终点a-战胜-1" });
+                MatchEqualEvents(SameMultiLineHandler(ToInfo(StartCombat),ToInfo(LeaveNestTrue)), myEventInfos, new string[] { "义士堂-终点bc-择一相助" });
+            }
+            //木头和金铁
             {
                 var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindJiuQu_Language_CN.txt");
-                MatchEqualEvents(ref Dibao_Give, myEventInfos, "_地宝紫竹-引藤", "九曲紫竹");
+                MatchEqualEvents(ref Dibao_Give_WoodIron, myEventInfos, "_地宝紫竹-引藤", "九曲紫竹");
                 MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_地宝紫竹-起b-1-1-1" , "_地宝紫竹-起a-1-1-1" }, "九曲紫竹same");
-                MatchEqualEvents(ref Dibao_Final_XieXieQiezi, myEventInfos, "_地宝紫竹-终a-1", "九曲紫竹终点");
+                MatchEqualEvents(ref Dibao_Final_WoodIron_XieXieQiezi, myEventInfos, "_地宝紫竹-终a-1", "九曲紫竹终点");
             }
             {
                 var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindZiTan_Language_CN.txt");
-                MatchEqualEvents(ref Dibao_Give, myEventInfos, new string[] { "_地宝紫檀-伐木一" , "_地宝紫檀-伐木二" }, "紫檀");
-                MatchEqualEvents(ref Dibao_Final, myEventInfos, "_地宝紫檀-终a-1", "紫檀终点");
+                MatchEqualEvents(ref Dibao_Give_WoodIron, myEventInfos, new string[] { "_地宝紫檀-伐木一" , "_地宝紫檀-伐木二" }, "紫檀");
+                MatchEqualEvents(ref Dibao_Final_WoodIron, myEventInfos, "_地宝紫檀-终a-1", "紫檀终点");
             }
 
             {
                 var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindXuanTie_Language_CN.txt");
-                MatchEqualEvents(ref Dibao_Give, myEventInfos, new string[] { "_地宝玄铁-炼铁二", "_地宝玄铁-炼铁一" }, "玄铁");
+                MatchEqualEvents(ref Dibao_Give_WoodIron, myEventInfos, new string[] { "_地宝玄铁-炼铁二", "_地宝玄铁-炼铁一" }, "玄铁");
                 MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_地宝玄铁-起a-1-1", "_地宝玄铁-起b-1-1" }, "玄铁same");
-                MatchEqualEvents(ref Dibao_Final_FuckQiezi, myEventInfos, "_地宝玄铁-终a-1", "玄铁终点");
+                MatchEqualEvents(ref Dibao_Final_WoodIron_FuckQiezi, myEventInfos, "_地宝玄铁-终a-1", "玄铁终点");
+            }
+            //毒物
+            {
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindFaceMan_Language_CN.txt");
+                MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_地宝人面-起a-1-1"});
+                MatchEqualEvents(new MyEventHandler(Dibao_Feed_Posion_Check, new object[] { 9 }), myEventInfos, new string[] {
+                    "_地宝人面-转a-1-1-1", "_地宝人面-转a-1-1-1（选择道具）"});
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 1 }), myEventInfos, "_地宝人面-生长-x-1夹竹桃-1");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 2 }), myEventInfos, "_地宝人面-生长-x-2彼岸花-1");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 3 }), myEventInfos, "_地宝人面-生长-x-3缚魂丝-1");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 4 }), myEventInfos, "_地宝人面-生长-x-4金怠花-1");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 5 }), myEventInfos, "_地宝人面-生长-x-5烟煴紫瘴-1");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 5 }), myEventInfos, "_地宝人面-生长-x-6无寐兰-1");//三品和四品材料效果一样
+
+                MatchEqualEvents(new MyEventHandler(Dibao_Pick_Trigger_Count, new object[] { 9}), myEventInfos, new string[] {
+                    "_地宝人面-探谷-1夹竹桃", "_地宝人面-探谷-2彼岸花","_地宝人面-探谷-3缚魂丝","_地宝人面-探谷-4金怠花","_地宝人面-探谷-5烟煴紫瘴","_地宝人面-探谷-6无寐兰"});
             }
             {
-                //var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindChanQiao_Language_CN.txt");
-                //MatchEqualEvents(ref Dibao_Give, myEventInfos, new string[] { "_地宝玄铁-炼铁二", "_地宝玄铁-炼铁一" }, "玄铁");
-                //MatchEqualEvents(ref Standard_AllSame, myEventInfos, new string[] { "_地宝玄铁-起a-1-1", "_地宝玄铁-起b-1-1" }, "玄铁same");
-                //MatchEqualEvents(ref Dibao_Final_FuckQiezi, myEventInfos, "_地宝玄铁-终a-1", "玄铁终点");
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindQingZhu_Language_CN.txt");
+                MatchEqualEvents(Standard_AllSame, myEventInfos, new string[] { "_地宝青蛛-高造诣起点2" , "_地宝青蛛-低造诣起点2" });
+                MatchEqualEvents(new MyEventHandler(Dibao_Feed_Posion_Check, new object[] { 9 }), myEventInfos, new string[] {
+                    "_地宝青蛛-低造诣转点2", "_地宝青蛛-低造诣转点2（选择道具）"});
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 1 }), myEventInfos, "_地宝青蛛-腐尸虫事件1");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 2 }), myEventInfos, "_地宝青蛛-蝮蛇涎事件1");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 3 }), myEventInfos, "_地宝青蛛-散瘟草事件2");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 4 }), myEventInfos, "_地宝青蛛-玄尸水事件2");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 5 }), myEventInfos, "_地宝青蛛-鬼虫事件2");
+                MatchEqualEvents(new MyEventHandler(Dibao_Grow_Posion, new object[] { 9, 5 }), myEventInfos, "_地宝青蛛-蛇骨事件2");//三品和四品材料效果一样
+
+                MatchEqualEvents(Dibao_Pick_Trigger_Count, myEventInfos, new string[] {
+                    "_地宝青蛛-获得腐尸虫1", "_地宝青蛛-获得蝮蛇涎1","_地宝青蛛-获得散瘟草1","_地宝青蛛-获得玄尸水1","_地宝青蛛-获得鬼虫1","_地宝青蛛-获得冥蛇骨1"});
             }
+            {
+                var myEventInfos = LoadEventFile("Taiwu_EventPackage_FindBingCan_Language_CN.txt");
+                MatchEqualEvents(SameMultiLineHandler(ToInfo("每次前进时获得寒毒(数量随步数增长)"),
+                    ToInfo("若毒术造诣>=300:只受到60%的毒"),//posionRate 5->3
+                    ToInfo("抗到终点获得二品材料")), myEventInfos, new string[] { "_地宝冰蚕-高造诣起点1", "_地宝冰蚕-低造诣起点1" });
+                MatchEqualEvents(Dibao_Pick_Step, myEventInfos, new string[] {
+                    "_地宝冰蚕-节点冽霜草1", "_地宝冰蚕-节点白蛇胆1","_地宝冰蚕-节点玄阴石1","_地宝冰蚕-节点寒玉蟾蜍1","_地宝冰蚕-节点玄冰琵琶蝎1","_地宝冰蚕-节点青蛟胆1"});
+            }
+
         }
 
-        public static MyEventHandler SimpleHandler(string option1,string option2)
+        public static MyEventHandler SimpleHandler(params object[] options)
         {
-            return new MyEventHandler(Standard_Simple,new object[] { option1,option2});
+            return new MyEventHandler(Standard_Simple, options);
         }
-        public static MyEventHandler SimpleHandler(string option1, string option2,string option3)
+        public static MyEventHandler SameMultiLineHandler(params string[] lines)
         {
-            return new MyEventHandler(Standard_Simple, new object[] { option1, option2,option3 });
+            return new MyEventHandler(Standard_AllSame, lines.ToArray<object>());
         }
         public static MyEventHandler MutltiCheckOrGiveUpHandler(string name, string option1, string option2)
         {
@@ -336,7 +387,10 @@ namespace Taiwu_Foresight
             return new MyEventHandler(Standard_Check2OrOther, new object[] { name, option1, option2, otherwise });
         }
 
-
+        public static void MatchEqualEvents(MyEventHandler handler, Dictionary<string, MyEventInfo> myEventInfos, string name, string fail_hint = "")
+        {
+            MatchEqualEvents(handler, myEventInfos, new string[] { name},fail_hint);
+        }
         public static void MatchEqualEvents(MyEventHandler handler, Dictionary<string, MyEventInfo> myEventInfos, string[] names, string fail_hint = "")
         {
             int ct = 0;
@@ -348,18 +402,9 @@ namespace Taiwu_Foresight
                         ct++;
                     }
                     else
-                    {
-                        UnityEngine.Debug.Log($"333{myEventInfos[name].guid} {name}");
-                    }
+                        UnityEngine.Debug.Log($"远见：重复Handler-{myEventInfos[name].guid} {name}");
             if (ct != names.Count())
-            {
                 LogUnexpectedEvent(fail_hint == "" ? String.Join("/", names) : fail_hint);
-                foreach (var name in names)
-                    if (myEventInfos.ContainsKey(name))
-                        UnityEngine.Debug.Log($"111{name}-{myEventInfos[name].guid}");
-                    else
-                        UnityEngine.Debug.Log($"222{name}");
-            }
         }
 
         public static void MatchEqualEvents(HandlerFuncType handler,Dictionary<string, MyEventInfo> myEventInfos, string[] names, string fail_hint = "")
@@ -387,7 +432,6 @@ namespace Taiwu_Foresight
         {
             MatchEvents(new MyEventHandler(handler),myEventInfos,regex_str,expect_ct,fail_hint);
         }
-
 
 
         public static void MatchEvents(ref HashSet<string> result, Dictionary<string, MyEventInfo> myEventInfos,string regex_str,int expect_ct,string fail_hint="")

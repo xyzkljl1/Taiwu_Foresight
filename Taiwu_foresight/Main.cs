@@ -48,7 +48,11 @@ namespace Taiwu_Foresight
             "neiQiDegree1",
             "neiQiDegree2",
             "neiQiDegree3",
-            "D0"
+            "D0",
+            "minValue",
+            "perValue",
+            "triggerCounter",
+            "step"
         };
         public static Dictionary<string,int> AdventureParameters = new Dictionary<string, int>();
         public static int sectId;
@@ -362,7 +366,7 @@ namespace Taiwu_Foresight
                 }
             }
             //	天材地宝
-            else if(Dibao_Give.Contains(currEventGuid))
+            else if(Dibao_Give_WoodIron.Contains(currEventGuid))
             {
                 var successRate = GetAdventureParameter("successRate");
                 var perSuccessRate = GetAdventureParameter("perSuccessRate");
@@ -393,7 +397,7 @@ namespace Taiwu_Foresight
                     result += ToInfo("什么都不会发生");
                 }
             }
-            else if (Dibao_Final.Contains(currEventGuid))
+            else if (Dibao_Final_WoodIron.Contains(currEventGuid))
             {
                 var successRate = GetAdventureParameter("successRate");
                 var perSuccessRate = GetAdventureParameter("perSuccessRate");
@@ -414,7 +418,7 @@ namespace Taiwu_Foresight
                     result += ToInfo($"获得二品材料概率=(成功率-20)*100/99={(successRate-20)*100/99}");
                 }
             }
-            else if (Dibao_Final_XieXieQiezi.Contains(currEventGuid))
+            else if (Dibao_Final_WoodIron_XieXieQiezi.Contains(currEventGuid))
             {
                 var successRate = GetAdventureParameter("successRate");
                 var perSuccessRate = GetAdventureParameter("perSuccessRate");
@@ -435,7 +439,7 @@ namespace Taiwu_Foresight
                     result += ToInfo($"获得二品材料概率=(成功率-20)*100/99={(successRate - 20)*100/99}");
                 }
             }
-            else if (Dibao_Final_FuckQiezi.Contains(currEventGuid))
+            else if (Dibao_Final_WoodIron_FuckQiezi.Contains(currEventGuid))
             {
                 var successRate = GetAdventureParameter("successRate");
                 var perSuccessRate = GetAdventureParameter("perSuccessRate");

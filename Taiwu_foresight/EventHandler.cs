@@ -10,6 +10,7 @@ namespace Taiwu_Foresight
     public partial class Foresight
     {
         public static string LeaveNestTrue = "关闭巢穴(无奖励)";
+        public static string AllSame = "别看了都一样";
         public static string LeaveNestFalse = "离开巢穴(不关闭)";
         public static string Nothing = "无事发生";
         public static string StartCombat = "开战";
@@ -114,16 +115,19 @@ namespace Taiwu_Foresight
             return "远见挂了！";
         }
 
-        public static string Standard_Simple(int idx, EventOptionInfo eventOptionInfo,  object[] paras)//有若干选项，各自为固定文本的简单选项
+        //若干固定文本的单行选项
+        public static string Standard_Simple(int idx, EventOptionInfo eventOptionInfo,  object[] paras)
         {
             if(paras!=null&&paras.Count()>idx)
                 return ToInfo(paras[idx] as string);
             return "远见挂了！";
         }
-
-        public static string Standard_AllSame(int idx, EventOptionInfo eventOptionInfo,  object[] paras)
+        //每个选项都一样，多行文本或固定"都一样"
+        public static string Standard_AllSame(int idx, EventOptionInfo eventOptionInfo, object[] paras)
         {
-            return ToInfo("别看了,都一样");
+            if (paras!=null&& paras.Count() >= 0)
+                return String.Join("",paras);
+            return ToInfo(AllSame);
         }
         public static string Standard_Destroy(int idx, EventOptionInfo eventOptionInfo, object[] paras)//六个选项的通用摧毁巢穴选项
         {
@@ -292,6 +296,101 @@ namespace Taiwu_Foresight
                 }
                 return "";
             }
+        }
+        //异士居
+        public static string YiShi_Challenge(int idx, EventOptionInfo eventOptionInfo, object[] paras)
+        {
+
+            if (idx == 0)
+            {
+                return
+                    ToInfo("开始较艺")
+                    + ToInfo("胜利:无事发生", 2)
+                    + ToInfo("失败:进入战斗分支");
+            }
+            else
+            {
+                return ToInfo("开战")
+                    +ToInfo("进入战斗分支");
+            }
+        }
+        //天材地宝
+        public static string Dibao_Feed_Posion_Check(int idx, EventOptionInfo eventOptionInfo, object[] paras)//道中给材料
+        {
+            if (idx == 1)
+                return ToInfo(Nothing);
+            if(paras!=null&&paras.Count()>0)
+            {
+                int skillType = (int)paras[0];
+                int minValue = GetAdventureParameter("minValue");
+                int perValue = GetAdventureParameter("perValue");
+                int successRate = GetAdventureParameter("successRate");
+                int perSuccessRate = GetAdventureParameter("perSuccessRate");
+                string skill_name = Config.LifeSkillType.Instance[skillType].Name;
+                return
+                    ToInfo($"当前灵气:{successRate}")
+                    + ToInfo("每投入一个材料，在前方添加一个对应品级的事件(问号格子)")
+                    + ToInfo($"如果触发事件，进行{skill_name}造诣检测")
+                    + ToInfo($"成功: 增加灵气",2)
+                    + ToInfo($"八品:造诣>={minValue},灵气增加{1 * perSuccessRate}", 3)
+                    + ToInfo($"七品:造诣>={minValue+perValue},灵气增加{2 * perSuccessRate}", 3)
+                    + ToInfo($"六品:造诣>={minValue + perValue*2},灵气增加{3 * perSuccessRate}", 3)
+                    + ToInfo($"五品:造诣>={minValue + perValue*3},灵气增加{4 * perSuccessRate}", 3)
+                    + ToInfo($"四品:造诣>={minValue + perValue*4},灵气增加{5 * perSuccessRate}", 3)
+                    + ToInfo($"三品:造诣>={minValue + perValue*4},灵气增加{5 * perSuccessRate}(和四品一样)", 3)
+                    + ToInfo("失败: 无事发生", 2)
+                    + ToInfo("终点获得二品材料概率=(灵气/99.0*100.0)%");
+            }
+            return "";
+        }
+        public static string Dibao_Grow_Posion(int idx, EventOptionInfo eventOptionInfo, object[] paras)//投入材料添加的事件
+        {
+            if (paras != null && paras.Count() > 1)
+            {
+                int skillType = (int)paras[0];
+                int rate = (int)paras[1];
+                int minValue = GetAdventureParameter("minValue");
+                int perValue = GetAdventureParameter("perValue");
+                int successRate = GetAdventureParameter("successRate");
+                int perSuccessRate = GetAdventureParameter("perSuccessRate");
+                string skill_name = Config.LifeSkillType.Instance[skillType].Name;
+                return
+                    ToInfo($"当前灵气:{successRate}")
+                    + ToInfo($"{skill_name}造诣检测")
+                    + ToInfo($"若>={minValue+ (rate-1)*perValue},灵气增加{rate * perSuccessRate}", 2)
+                    + ToInfo("否则: 无事发生", 2)
+                    + ToInfo("终点获得二品材料概率=(灵气/99.0*100.0)%")
+                    + ToInfo("别看了，都一样");
+            }
+            return "";
+        }
+        public static string Dibao_Pick_Trigger_Count(int idx, EventOptionInfo eventOptionInfo, object[] paras)//随机获得材料
+        {
+            int triggerCounter = GetAdventureParameter("triggerCounter")+1;//因为显示出此文字时triggerCounter已经在OnEventEnter中+1过了
+            return ToInfo($"当前计数{triggerCounter}")
+                + ToInfo($"每触发一次该事件，计数+1", 2)
+                + ToInfo($"进入奇遇时造诣>=300,计数+3", 2)
+                + ToInfo($"采集事件获得材料概率(从上至下判断,成功即停止)")
+                + ToInfo($"三品:(0+计数*计数*35*1/100)/99.0*100.0={((0 + triggerCounter * triggerCounter * 35 * 100 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"四品:(10+计数*计数*35*2/100)/99.0*100.0={((10 + triggerCounter * triggerCounter * 35 * 200 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"五品:(20+计数*计数*35*3/100)/99.0*100.0={((20 + triggerCounter * triggerCounter * 35 * 300 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"六品:(30+计数*计数*35*4/100)/99.0*100.0={((30 + triggerCounter * triggerCounter * 35 * 400 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"七品:(40+计数*计数*35*5/100)/99.0*100.0={((40 + triggerCounter * triggerCounter * 35 * 500 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"八品:(50+计数*计数*35*6/100)/99.0*100.0={((50 + triggerCounter * triggerCounter * 35 * 600 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2);
+        }
+        public static string Dibao_Pick_Step(int idx, EventOptionInfo eventOptionInfo, object[] paras)
+        {
+            int step = GetAdventureParameter("step");
+            return ToInfo($"当前步数{step}")
+                + ToInfo($"每前进一格,步数+1",2)
+                + ToInfo($"进入奇遇时造诣>=300,步数+15")
+                + ToInfo($"采集事件获得材料概率(从上至下判断,成功即停止)")
+                + ToInfo($"三品:(0+步数*步数*2*1/100)/99.0*100.0={((0 + step * step * 200 * 1 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"四品:(10+步数*步数*2*2/100)/99.0*100.0={((10 + step * step * 200 * 2 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"五品:(20+步数*步数*2*3/100)/99.0*100.0={((20 + step * step * 200 * 3 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"六品:(30+步数*步数*2*4/100)/99.0*100.0={((30 + step * step * 200 * 4 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"七品:(40+步数*步数*2*5/100)/99.0*100.0={((40 + step * step * 200 * 5 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2)
+                + ToInfo($"八品:(50+步数*步数*2*6/100)/99.0*100.0={((50 + step * step * 200 * 6 / 10000) * 100.0 / 99.0).ToString("f2")}%", 2);
         }
     }
 }

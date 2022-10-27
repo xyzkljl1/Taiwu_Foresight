@@ -36,7 +36,11 @@ namespace Taiwu_foresight_backend
             "neiQiDegree1",
             "neiQiDegree2",
             "neiQiDegree3",
-            "D0"
+            "D0",
+            "minValue",
+            "perValue",
+            "triggerCounter",
+            "step"
         };
         public override void Dispose()
         {
