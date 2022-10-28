@@ -40,7 +40,12 @@ namespace Taiwu_foresight_backend
             "minValue",
             "perValue",
             "triggerCounter",
-            "step"
+            "step",
+            "perPoison",
+            "getItem",
+            "successRateEx",
+            "valueNeed"
+
         };
         public override void Dispose()
         {
@@ -76,11 +81,11 @@ namespace Taiwu_foresight_backend
             }
             return true;
         }
+        /*
         [HarmonyPrefix, HarmonyPatch(typeof(EventArgBox), "GetAdventureMajorCharacter")]
         public static void GetAdventureMajorCharacterPatch(EventArgBox __instance, int group, int index)
         {
             //debug用
-            var result = "";
             var charId =0;
             Dictionary<int, Character> dictionary = (Dictionary<int, Character>)Traverse.Create(DomainManager.Character).Field("_objects").GetValue();
             foreach (Character character in dictionary.Values)
@@ -89,9 +94,8 @@ namespace Taiwu_foresight_backend
                     charId=character.GetId();
                     break;
             }
-
-                __instance.Set(string.Format("MajorCharacter_{0}_{1}", group, index), charId);
-        }
+            __instance.Set(string.Format("MajorCharacter_{0}_{1}", group, index), charId);
+        }*/
 
     }
 }
